@@ -23,6 +23,10 @@ crate
 
 */
 
+pub use backend::api::*;
+pub use backend::onyx::*;
+pub use backend::zk::*;
+
 pub mod backend {
     pub mod api {
 
@@ -46,7 +50,7 @@ pub mod backend {
         // vendor api
         pub fn post_new_vp() {
             // create a vp
-            onyx::create_sign_vp();
+            // onyx::create_sign_vp();
 
             // store in db
             todo!();
@@ -58,7 +62,7 @@ pub mod backend {
         // HCP issuer api
         pub fn post_new_DID() {
             // create did
-            onyx::create_did();
+            // onyx::create_did();
 
             // return status
             todo!();
@@ -66,7 +70,7 @@ pub mod backend {
 
         pub fn put_update_DID() {
               // update did
-              onyx::update_did();
+            //   onyx::update_did();
 
               // return status
               todo!();
@@ -74,7 +78,7 @@ pub mod backend {
 
         pub fn delete_DID() {
               // cancel did
-              onyx::cancel_did();
+            //   onyx::cancel_did();
 
               // return status
               todo!();
@@ -83,7 +87,7 @@ pub mod backend {
         // Verifier api
         pub fn get_verify_vcp() {
             // validate vp
-            onyx::validate_vp();
+            // onyx::validate_vp();
 
             // return status
             todo!();
@@ -92,19 +96,29 @@ pub mod backend {
     }
 
     pub mod onyx {
-        pub fn create_did() {}
-        pub fn update_did() {}
-        pub fn cancel_did() {}
+
+        pub fn create_did() {
+            // create did
+            todo!();
+        }
+        pub fn update_did() {
+            // update did
+            todo!();
+        }
+        pub fn cancel_did() {
+            // cancel did
+            todo!();
+        }
         pub fn create_sign_vp() {
             // create zkp for data field
-            zk::create_zkp();
+            // zk::create_zkp();
 
             // return signed vp
             todo!();
         }
         pub fn validate_vp() {
             // validate zkp
-            zk::validate_zkp();
+            // zk::validate_zkp();
 
             // return status
             todo!();
@@ -122,8 +136,3 @@ pub mod backend {
         }
     }
 }
-
-
-pub use backend::api::*;
-pub use backend::onyx::*;
-pub use backend::zk::*;
