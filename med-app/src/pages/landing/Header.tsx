@@ -17,6 +17,7 @@ import {
   Text,
   ThemeIcon,
   UnstyledButton,
+  Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -99,6 +100,17 @@ const useStyles = createStyles((theme) => ({
       display: 'none',
     },
   },
+  title: {
+    color: theme.fn.primaryColor(),
+    fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+    fontSize: 56,
+    lineHeight: 1.2,
+    fontWeight: 600,
+
+    [theme.fn.smallerThan('xs')]: {
+      fontSize: 28,
+    },
+  },
 }));
 
 const mockdata = [
@@ -164,7 +176,8 @@ export function Header(): JSX.Element {
         <Container py={20}>
           <Group position="apart">
             <UnstyledButton className={classes.logoButton} onClick={() => navigate('/')}>
-              <Logo width={240} />
+              {/* <Logo width={240} />  */}
+              <Title className={classes.title}>Health Management System</Title>
             </UnstyledButton>
 
             <Group sx={{ height: '100%' }} spacing={0} className={classes.hiddenMobile}>

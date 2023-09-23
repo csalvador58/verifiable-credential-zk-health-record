@@ -88,6 +88,7 @@ const useStyles = createStyles((theme) => ({
     left: 435,
     width: 288,
     height: 288,
+    marginTop: 25,
 
     [theme.fn.smallerThan('md')]: {
       position: 'static',
@@ -142,24 +143,24 @@ const useStyles = createStyles((theme) => ({
 
 const features = [
   {
-    title: 'Comprehsive Care Plans',
+    title: 'Created on the Medplum platform',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      `Open source project focused on FHIR standards while providing a secure and compliant data infrastructure layer. Organizations that support FHIR include EPIC Systems, SMART, CommonWell Health Alliance, and even Apple with the iPhone Health App.`,
   },
   {
-    title: 'No hidden fees',
+    title: 'Generate DIDs on demand',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'Use standard templates generate a DID based on your personal health records.',
   },
   {
-    title: '24/7 Messaging',
+    title: 'Create Verifiable Presentations',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'Easily select available DIDs to generate a verifiable presentation for verifiers.',
   },
   {
-    title: 'Clinically rigorous',
+    title: 'Zero Knowledge',
     description:
-      'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.',
+      'Verify with privacy intact.',
   },
 ];
 
@@ -169,18 +170,17 @@ export function LandingPage(): JSX.Element {
   return (
     <div className={classes.outer}>
       <Header />
-      <img className={classes.heroImage1} src={WorkingEnvironmentImage} alt="Working Environment" />
+      <img className={classes.heroImage1} src='https://images.unsplash.com/photo-1584515933487-779824d29309?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3000&q=80' alt={`Holding patient's hand`} />
       <Container>
         <div className={classes.inner}>
           <div className={classes.content}>
             <Title className={classes.title}>
-              An extraordinary
+              Verifiable
               <br />
-              <span className={classes.highlight}>doctor&apos;s office</span>
+              <span className={classes.highlight}>Health Credentials</span>
             </Title>
             <Text size="lg" color="dimmed" mt="md">
-              This is not actually a medical practice, this is a sample open source application for developers to clone,
-              customize and run.
+              Create verifiable presentations of your health records and send to verifiers as proofs.
             </Text>
             <Group mt={30}>
               <Button radius="xl" size="md" className={classes.control}>
@@ -191,7 +191,7 @@ export function LandingPage(): JSX.Element {
               </Button>
             </Group>
           </div>
-          <img className={classes.heroImage2} src={DoctorImage} alt="Doctor" />
+          <img className={classes.heroImage2} src='https://images.unsplash.com/photo-1603899122361-e99b4f6fecf5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80' alt="Hand holding mobile phone with a green verify logo on screen" />
         </div>
       </Container>
       <Container>
@@ -201,14 +201,13 @@ export function LandingPage(): JSX.Element {
               Healthcare
             </Text>
             <Text size={36} weight={500} mb="md">
-              A better way to get care
+              The future of healthcare is now
             </Text>
             <Text size={20} c={theme.colors.gray[7]}>
-              Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in
-              accusamus quisquam.
+              Built with Onyx by J.P. Morgan, Biconomy, and Medplum. Your health is your data.
             </Text>
           </div>
-          <img className={classes.heroImage3} src={LabImage} alt="Laboratory" />
+          <img className={classes.heroImage3} src='https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80' alt="Woman staring into sunlight in the woods" />
         </div>
       </Container>
       <Container>
@@ -221,7 +220,7 @@ export function LandingPage(): JSX.Element {
               </Box>
             ))}
           </Stack>
-          <img className={classes.heroImage4} src={EngineeringImage} alt="Laboratory" />
+          <img className={classes.heroImage4} src='https://images.unsplash.com/photo-1642104704074-907c0698cbd9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3132&q=80' alt="Ethereum blockchain logo" />
         </div>
       </Container>
       <Footer />

@@ -29,7 +29,7 @@ export function Footer(): JSX.Element {
             </SimpleGrid>
             <Divider />
             <Text color="dimmed" size="sm">
-              &copy; {new Date().getFullYear()} Foo Medical, Inc. All rights reserved.
+              &copy; {new Date().getFullYear()} Health Management System, Inc. All rights reserved.
             </Text>
           </Stack>
         </Container>

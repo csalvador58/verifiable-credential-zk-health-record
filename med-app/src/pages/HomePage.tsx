@@ -104,7 +104,7 @@ const useStyles = createStyles((theme) => ({
 const carouselItems = [
   {
     img: <IconChecklist />,
-    title: 'Welcome to Foo Medical',
+    title: 'Welcome to HMS',
     description:
       'Lorem ipsum at porta donec ultricies ut, arcu morbi amet arcu ornare, curabitur pharetra magna tempus',
     url: '/get-care',
@@ -168,7 +168,7 @@ const recommendations = [
   },
   {
     title: 'Request health record',
-    description: 'Get records sent to or from Foo Medical.',
+    description: 'Get records sent to or from HMS.',
   },
 ];
 

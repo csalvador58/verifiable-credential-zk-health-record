@@ -15,10 +15,11 @@ export function RegisterPage(): JSX.Element {
           recaptchaSiteKey={MEDPLUM_RECAPTCHA_SITE_KEY}
           onSuccess={() => navigate('/')}
         >
-          <h2>Register with Foo Medical</h2>
+          <h2>Register with HMS</h2>
         </RegisterForm>
       </Box>
-      <BackgroundImage src="https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1567&amp;q=80" />
+      {/* <BackgroundImage src="https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1567&amp;q=80" /> */}
+      <BackgroundImage src="https://images.unsplash.com/photo-1444312645910-ffa973656eba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1567&amp;q=80" />
     </SimpleGrid>
   );
 }
