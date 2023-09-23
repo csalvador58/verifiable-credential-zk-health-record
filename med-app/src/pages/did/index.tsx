@@ -5,11 +5,15 @@ import { Loading } from '../../components/Loading';
 import { SideMenu } from '../../components/SideMenu';
 
 export const sideMenu = {
-  title: 'Care Plan',
-  menu: [{ name: 'Action Items', href: '/care-plan/action-items' }],
+  title: 'Menu',
+  menu: [
+    { name: 'Sign-In', href: '/did-main/login' },
+    { name: 'View List', href: '/did-main/DID-items' },
+    { name: 'Create', href: '/did-main/create' },
+  ],
 };
 
-export function CarePlanPage(): JSX.Element {
+export function DIDMainPage(): JSX.Element {
   return (
     <Container>
       <Group align="top">

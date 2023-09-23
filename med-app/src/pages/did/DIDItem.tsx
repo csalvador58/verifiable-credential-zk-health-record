@@ -3,18 +3,22 @@ import { CarePlan } from '@medplum/fhirtypes';
 import { ResourceTable, useMedplum } from '@medplum/react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
+import { dids } from './dids';
 
-export function ActionItem(): JSX.Element {
+export function DIDItem(): JSX.Element {
   const medplum = useMedplum();
   const { itemId } = useParams();
-  const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
+  // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
+
+
+  const resource = (dids.find((did) => did.id === itemId))!;
 
   return (
     <Box p="xl">
       <Title order={2} mb="md">
-        {resource.title}
+        DID Details
       </Title>
-      <InfoSection title="Action Item">
+      <InfoSection title="DID">
         <ResourceTable value={resource} ignoreMissingValues />
       </InfoSection>
     </Box>

@@ -6,30 +6,32 @@ import { IconCalendar } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
+import { dids } from './dids';
 
-export function ActionItems(): JSX.Element {
+export function DIDItems(): JSX.Element {
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const medplum = useMedplum();
   const patient = medplum.getProfile() as Patient;
-  const carePlans = medplum.searchResources('CarePlan', 'subject=' + getReferenceString(patient)).read();
+  // const carePlans = medplum.searchResources('CarePlan', 'subject=' + getReferenceString(patient)).read();
 
   return (
     <Box p="xl">
-      <Title mb="lg">Action Items</Title>
-      <InfoSection title="Action Items">
+      <Title mb="lg">Decentralized IDs</Title>
+      <InfoSection title="DIDs">
         <Stack spacing={0}>
-          {carePlans.map((resource) => (
+          {dids.map((resource) => (
             <InfoButton key={resource.id} onClick={() => navigate(`./${resource.id}`)}>
+            {/* <InfoButton key={resource.id} onClick={() => null}> */}
               <div>
                 <Text c={theme.fn.primaryColor()} fw={500}>
                   {resource.title}
                 </Text>
-                <Text mt="sm" c="gray.5" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {/* <Text mt="sm" c="gray.5" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <IconCalendar size={16} />
                   <time>{formatDate(resource.period?.start)} </time>
                   {resource.period?.end && <time>&nbsp;-&nbsp;{formatDate(resource.period.end)}</time>}
-                </Text>
+                </Text> */}
               </div>
               <StatusBadge status={resource.status as string} />
             </InfoButton>
