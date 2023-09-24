@@ -65,9 +65,12 @@
     "@biconomy/bundler": "^3.1.0",
     "@biconomy/common": "^3.1.0",
     "@biconomy/core-types": "^3.1.0",
+    "@biconomy/modules": "^3.1.0",
     "@biconomy/paymaster": "^3.1.0",
     "@biconomy/web3-auth": "^3.1.0",
     "@walletconnect/ethereum-provider": "^2.10.1",
+    "ethers": "^5.7.2",
+    "magic-sdk": "^20.0.2",
     "react-toastify": "^9.1.3"
   }
 }

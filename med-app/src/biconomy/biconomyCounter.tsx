@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BiconomySmartAccount } from '@biconomy/account';
+import { BiconomySmartAccountV2 } from '@biconomy/account';
 import {
   IHybridPaymaster,
   SponsorUserOperationDto,
@@ -11,7 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Props {
-  smartAccount: BiconomySmartAccount;
+  smartAccount: BiconomySmartAccountV2;
   provider: ethers.providers.Provider;
 }
 
@@ -24,6 +24,9 @@ const Counter: React.FC<Props> = ({ smartAccount, provider }) => {
   const [counterContract, setCounterContract] =
     useState<ethers.Contract | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  console.log("smartAccount: ", smartAccount)
+  console.log("provider: ", provider)
 
   const counterAddress = import.meta.env.VITE_COUNTER_CONTRACT_ADDRESS;
   console.log("counterAddress: ", counterAddress)
@@ -54,6 +57,7 @@ const Counter: React.FC<Props> = ({ smartAccount, provider }) => {
   };
 
   const incrementCount = async () => {
+    console.log('Incrementing count...');
     try {
       toast.info('Processing count on the blockchain!', {
         position: 'top-right',
@@ -85,10 +89,14 @@ const Counter: React.FC<Props> = ({ smartAccount, provider }) => {
       const BiconomyPaymaster =
         smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
 
-      const paymasterServiceData: SponsorUserOperationDto = {
-        mode: PaymasterMode.SPONSORED,
-        // optional params...
-      };
+        let paymasterServiceData: SponsorUserOperationDto = {
+          mode: PaymasterMode.SPONSORED,
+          smartAccountInfo: {
+            name: 'BICONOMY',
+            version: '2.0.0'
+          },
+          // optional params...
+        };
 
       try {
         const paymasterAndDataResponse =
