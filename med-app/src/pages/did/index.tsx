@@ -20,7 +20,7 @@ export function DIDMainPage(): JSX.Element {
     {
       title: 'Menu',
       menu: [
-        { name: 'Sign-In', href: '/did-main/login' },
+        { name: 'Login', href: '/did-main/DID-items/login' },
         { name: 'View List', href: '/did-main/DID-items' },
         { name: 'Create', href: '/did-main/create' },
       ],

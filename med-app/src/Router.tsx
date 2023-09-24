@@ -20,6 +20,7 @@ import { HomePage } from './pages/HomePage';
 import { Messages } from './pages/MessagesPage';
 import { ObservationPage } from './pages/ObservationPage';
 import { SignOutPage } from './pages/SignOutPage';
+import { BiconomyLogin } from './biconomy/biconomyLogin';
 
 export function Router(): JSX.Element {
   return (
@@ -42,6 +43,7 @@ export function Router(): JSX.Element {
         <Route index element={<Navigate replace to="/did-main/DID-items" />} />
         <Route path="DID-items" element={<DIDItems />} />
         <Route path="DID-items/:itemId" element={<DIDItem />} />
+        <Route path="DID-items/login" element={<BiconomyLogin />} />
       </Route>
       <Route path="get-care/*" element={<GetCare />} />
       <Route path="account/*" element={<AccountPage />}>
