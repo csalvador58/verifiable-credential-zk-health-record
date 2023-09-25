@@ -25,11 +25,7 @@ const Counter: React.FC<Props> = ({ smartAccount, provider }) => {
     useState<ethers.Contract | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  console.log("smartAccount: ", smartAccount)
-  console.log("provider: ", provider)
-
   const counterAddress = import.meta.env.VITE_COUNTER_CONTRACT_ADDRESS;
-  console.log("counterAddress: ", counterAddress)
 
   useEffect(() => {
     setIsLoading(true);

@@ -30,38 +30,6 @@ export const magic = new Magic(import.meta.env.VITE_PUBLIC_MAGIC_API_KEY, {
   },
 });
 
-const connect = async (setProviderCb: any, setSmartAccountCb: any) => {
-
-  try {
-    await magic.wallet.connectWithUI();
-    const web3Provider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
-    console.log('web3Provider: ', web3Provider);
-    setProviderCb(web3Provider);
-    
-
-    const module = await ECDSAOwnershipValidationModule.create({
-      signer: web3Provider.getSigner(),
-      moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
-    });
-
-    let biconomySmartAccount = await BiconomySmartAccountV2.create({
-      chainId: ChainId.POLYGON_MUMBAI,
-      bundler: bundler,
-      paymaster: paymaster,
-      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-      defaultValidationModule: module,
-      activeValidationModule: module,
-    });
-
-    const address = await biconomySmartAccount.getAccountAddress();
-    console.log('biconomySmartAccount address: ', address);
-    setSmartAccountCb(biconomySmartAccount);
-  } catch (error) {
-    console.error(error);
-  }
-
-};
-
 export function BiconomyLogin() {
   const [smartAccount, setSmartAccount] = useState<any>(null);
   const [interval, enableInterval] = useState(false);
@@ -71,21 +39,73 @@ export function BiconomyLogin() {
 
 
   useEffect(() => {
-    let configureLogin: NodeJS.Timeout | undefined;
+    console.log('useEffect - magic provider status: ', !!magic?.rpcProvider, magic?.rpcProvider);
+    let configureLogin: string | number | NodeJS.Timer | undefined; 
+    console.log('interval: ', interval);
     if (interval) {
       configureLogin = setInterval(() => {
-        if (!!sdkRef.current?.provider) {
-          // setupSmartAccount();
-          clearInterval(configureLogin);
+        console.log('Configure login...')
+        if (!!magic?.rpcProvider) {
+          setupSmartAccount()
+          clearInterval(configureLogin)
         }
-      }, 1000);
+      }, 1000)
     }
-  }, [interval]);
+  }, [interval])
 
-  const connectHandler = async () => {
-    connect(setProvider, setSmartAccount);
+  const connect = async () => {
+    console.log('Connect - magic provider status: ', magic?.rpcProvider);
+
+    if (!magic?.rpcProvider) {
+      
+      console.log('Connect magic: ', magic);
+      try {
+        enableInterval(true);
+      } catch (error) {
+        console.error(error);
+      }
+  } else {
+      setupSmartAccount();
+  }
+
+   
+  
   };
   
+  const setupSmartAccount = async () => {
+    console.log('setupSmartAccount - magic provider status: ', !!magic?.rpcProvider);
+    if (!magic?.rpcProvider) return;
+    await magic.wallet.connectWithUI();
+    setLoading(true);
+    
+    try {
+      console.log('setupSmartAccount');
+      const web3Provider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
+      setProvider(web3Provider);
+      const module = await ECDSAOwnershipValidationModule.create({
+        signer: web3Provider.getSigner(),
+        moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+      });
+  
+      console.log('module: ', module);
+      let biconomySmartAccount = await BiconomySmartAccountV2.create({
+        chainId: ChainId.POLYGON_MUMBAI,
+        bundler: bundler,
+        paymaster: paymaster,
+        entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+        defaultValidationModule: module,
+        activeValidationModule: module,
+      });
+      
+      console.log("address: ", await biconomySmartAccount.getAccountAddress())
+      console.log("deployed: ", await biconomySmartAccount.isAccountDeployed( await biconomySmartAccount.getAccountAddress()))
+  
+      setSmartAccount(biconomySmartAccount)
+      setLoading(false)
+    } catch (err) {
+        console.log("error setting up smart account... ", err);
+    }
+  }
 
   const logout = async () => {
     if (await magic?.user.isLoggedIn()) {
@@ -107,7 +127,7 @@ export function BiconomyLogin() {
     <div>
       <h1> Biconomy Smart Accounts using Magic login + Gasless Transactions</h1>
 
-      {!smartAccount && !loading && <button onClick={connectHandler}>Magic Login</button>}
+      {!smartAccount && !loading && <button onClick={connect}>Magic Login</button>}
       {loading && <p>Loading account details...</p>}
       {!!smartAccount && (
         <div className="buttonWrapper">
