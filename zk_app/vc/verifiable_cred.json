@@ -1,0 +1,12 @@
+{
+    "boolean_field": true,
+    "data": "secret",
+    "obj_field": {
+        "string_subfield": "test",
+        "array_subfield": [
+            "more",
+            "example",
+            "text"
+        ]
+    }
+}
