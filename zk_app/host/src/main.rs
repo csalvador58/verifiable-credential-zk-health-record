@@ -1,29 +1,45 @@
+use json_core::Outputs;
+use risc0_zkvm::{
+    default_prover,
+    serde::{from_slice, to_vec},
+    ExecutorEnv,
+};
 use zk_methods::{VALIDATE_ELF, VALIDATE_ID};
-use risc0_zkvm::{default_prover, ExecutorEnv};
 
 fn main() {
-    // First, we construct an executor environment
-    let env = ExecutorEnv::builder().build().unwrap();
+    // Read the VC from a file
+    // TODO: Update to receive VC from api
+    let vc_data = include_str!("../../vc/verifiable_cred.json");
 
-    // TODO: add guest input to the executor environment using
-    // ExecutorEnvBuilder::add_input().
-    // To access this method, you'll need to use the alternate construction
-    // ExecutorEnv::builder(), which creates an ExecutorEnvBuilder. When you're
-    // done adding input, call ExecutorEnvBuilder::build().
+    // Perform validation on verifiable credential
+    let zkp_receipt: Outputs = vc_search_json(vc_data);
 
-    // For example:
-    // let env = ExecutorEnv::builder().add_input(&vec).build().unwrap();
+    // Display receipt from journal
+    println!("\n\nReceipt:\n");
+    println!("Hash: {:?}", zkp_receipt.hash);
+    println!("Data {:?}\n\n", String::from_utf8(zkp_receipt.verifiable_data).unwrap());
+}
 
-    // Obtain the default prover.
+fn vc_search_json(verifiable_credential: &str) -> Outputs {
+    // Construct an executor environment with the VC as input
+    let env = ExecutorEnv::builder()
+        .add_input(&to_vec(&verifiable_credential).unwrap()) // serialize the VC
+        .build()
+        .unwrap();
+
+    // Create a prover instance.
     let prover = default_prover();
 
-    // Produce a receipt by proving the specified ELF binary.
+    // Run the guest code and prove the specified ELF binary and generate a receipt
+    // Generate a receipt containing the journal, proven outputs, proof of compute
+    // No other data from the verifiable credential is included
     let receipt = prover.prove_elf(env, VALIDATE_ELF).unwrap();
-
-    // TODO: Implement code for transmitting or serializing the receipt for
-    // other parties to verify here
-
-    // Optional: Verify receipt to confirm that recipients will also be able to
-    // verify your receipt
+    
+    // Verify the receipt / zk proof
+    // VALIDATE_ID is the hash of the validate method
     receipt.verify(VALIDATE_ID).unwrap();
+    println!("\nReceipt verified successfully");
+
+    // Deserialize and return the public output and hash of the guest program
+    from_slice(&receipt.journal).unwrap()
 }

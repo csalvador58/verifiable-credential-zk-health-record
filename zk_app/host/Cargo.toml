@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-zk_methods = { path = "../methods" }
+json = "0.12"
+json-core = { path = "../core" }
+zk-methods = { path = "../methods" }
 risc0-zkvm = { version = "0.18.0" }
 serde = "1.0"
