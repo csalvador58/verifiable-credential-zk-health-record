@@ -13,6 +13,7 @@ tsconfig.tsbuildinfo
 
 # misc
 .DS_Store
+.vscode
 .env
 .env.local
 .env.development.local
@@ -25,3 +26,8 @@ yarn-error.log*
 
 
 **/.dockerignore
+
+# risczero
+**/Cargo.lock
+**/methods/guest/Cargo.lock
+**/target/
