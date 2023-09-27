@@ -1,83 +1,68 @@
+use actix_web::body::BoxBody;
+use actix_web::http::header::ContentType;
+use actix_web::http::StatusCode;
+use actix_web::{
+    delete, get, post, put, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
+    ResponseError,
+};
 use host::zkvm_host;
 use std::env;
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+
+use serde::{Deserialize, Serialize};
+
+use std::fmt::Display;
+use std::sync::Mutex;
+
 mod resources;
 
-#[macro_use]
-extern crate serde_derive;
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    println!("Server has been started on http://localhost:8000");
 
-const OK_RESPONSE: &str = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n";
-const NOT_FOUND_RESPONSE: &str = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
-const INTERNAL_SERVER_ERROR_RESPONSE: &str = "HTTP/1.1 500 INTERNAL SERVER ERROR\r\n\r\n";
-
-fn main() {
-    // start server and print port
-    let listener = TcpListener::bind(format!("0.0.0.0:8080")).unwrap();
-    println!("Listening on port {}", 8080);
-
-    // accept connections and process them serially
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
-                handle_request(stream);
-            }
-            Err(e) => {
-                println!("Error: {}", e);
-            }
-        }
-    }
+    HttpServer::new(move || App::new().service(create_zkp))
+        .bind(("127.0.0.1", 8000))?
+        .run()
+        .await
 }
 
 // handle routes
 // TODO: add more routes
-fn handle_request(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
-    let mut request = String::new();
+#[post("/zkp/create")]
+async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Responder {
+    let new_vc = resources::VerifiableCredential {
+        boolean_field: req.boolean_field,
+        data: String::from(&req.data),
+        obj_field: resources::ObjectField {
+            string_subfield: String::from(&req.obj_field.string_subfield),
+            array_subfield: req
+                .obj_field
+                .array_subfield
+                .iter()
+                .map(|s| String::from(s))
+                .collect(),
+        },
+    };
 
-    match stream.read(&mut buffer) {
-        Ok(size) => {
-            request.push_str(String::from_utf8_lossy(&buffer[..size]).as_ref());
+    // let response = serde_json::to_string(&new_vc).unwrap();
+    let new_vc_to_string = serde_json::to_string(&new_vc).unwrap();
+    let zkp_receipt = zkvm_host(&new_vc_to_string);
+    let response = format!(
+        "{{\"hash\": {:?}, \"verifiable_data\": {:?}}}",
+        zkp_receipt.hash,
+        String::from_utf8(zkp_receipt.verifiable_data).unwrap()
+    );
 
-            let (status_line, content) = match &*request {
-                req if req.starts_with("GET /zkp/validate_proof") => validate_proof(req),
-                _ => (NOT_FOUND_RESPONSE.to_string(), "404 Not Found".to_string()),
-            };
-
-            stream
-                .write_all(format!("{}{}", status_line, content).as_bytes())
-                .unwrap();
-        }
-        Err(e) => {
-            println!("Error: {}", e);
-        }
-    }
+    HttpResponse::Created()
+        .content_type(ContentType::json())
+        .body(response)
 }
 
-// Controllers
-// TODO: add more controllers
-fn validate_proof(request: &str) -> (String, String) {
-    match get_request_body(&request) {
-        Ok(body) => {
-            println!("Request Body: ");
-            let vc_data = format!("{:?}", body);
-            println!("Verifiable Credential Data: {:?}", vc_data);
+/*
+{"hash": Digest(1ef1cbfb2293b8915abad89364c54f931d176cf6237ce6343dd4590fb848357a), 
+"verifiable_data": "secret sauce"}
 
-            // response back with request body
-            (OK_RESPONSE.to_string(), vc_data)
-            // let zkp_receipt = zkvm_host(vc_data);
-            // let response = format!("{{\"hash\": {:?}, \"verifiable_data\": {:?}}}", zkp_receipt.hash, String::from_utf8(zkp_receipt.verifiable_data).unwrap());
-            // (OK_RESPONSE.to_string(), response)
-        }
-        _ => (
-            INTERNAL_SERVER_ERROR_RESPONSE.to_string(),
-            "500 Internal Server Error".to_string(),
-        ),
-    }
-}
-
-// deserialize json from request body
-// TODO: add more models
-fn get_request_body(request: &str) -> Result<resources::VerifiableCredential, serde_json::Error> {
-    serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
-}
+{"hash": Digest(0d734f1cbd7048e796ae0ae9d4885848a4eaaa30be2aeb299827e7e7fb24b834), 
+"verifiable_data": "secret"}
+*/

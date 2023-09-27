@@ -6,24 +6,27 @@ use risc0_zkvm::{
 };
 use zk_methods::{VALIDATE_ELF, VALIDATE_ID};
 
-pub fn zkvm_host() {
+pub fn zkvm_host(verifiable_credential: &str) -> Outputs {
     // Read the VC from a file
     // TODO: Update to receive VC from api
-    let vc_data = include_str!("../../vc/verifiable_cred.json");
+    // let vc_data = include_str!("../../vc/verifiable_cred.json");
 
     // Perform validation on verifiable credential
-    let zkp_receipt: Outputs = vc_search_json(vc_data);
+    let zkp_receipt: Outputs = vc_search_json(verifiable_credential);
 
     // Display receipt from journal
     println!("\n\nReceipt:\n");
     println!("Hash: {:?}", zkp_receipt.hash);
-    println!("Data {:?}\n\n", String::from_utf8(zkp_receipt.verifiable_data).unwrap());
+    println!("Data {:?}\n\n", String::from_utf8(zkp_receipt.verifiable_data.clone()).unwrap());
+
+    // Return receipt
+    zkp_receipt
 }
 
-fn vc_search_json(verifiable_credential: &str) -> Outputs {
+fn vc_search_json(vc: &str) -> Outputs {
     // Construct an executor environment with the VC as input
     let env = ExecutorEnv::builder()
-        .add_input(&to_vec(&verifiable_credential).unwrap()) // serialize the VC
+        .add_input(&to_vec(&vc).unwrap()) // serialize the VC
         .build()
         .unwrap();
 
