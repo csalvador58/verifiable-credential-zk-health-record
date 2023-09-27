@@ -6,7 +6,7 @@ use risc0_zkvm::{
 };
 use zk_methods::{VALIDATE_ELF, VALIDATE_ID};
 
-fn main() {
+pub fn zkvm_host() {
     // Read the VC from a file
     // TODO: Update to receive VC from api
     let vc_data = include_str!("../../vc/verifiable_cred.json");
