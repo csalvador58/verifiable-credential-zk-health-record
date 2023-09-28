@@ -17,18 +17,18 @@ export function Medication(): JSX.Element {
       <Title order={2}>{med.medicationCodeableConcept?.text}</Title>
       <p className="mb-6 text-lg text-gray-600">To refill this medication, please contact your pharmacy.</p>
       <p className="mb-6 text-lg text-gray-600">
-        No more refills available at your pharmacy?{' '}
-        <Anchor onClick={() => setModalOpen(true)}>Renew your prescription</Anchor>
+        Need to create a DID for this record?{' '}
+        <Anchor onClick={() => setModalOpen(true)}>Request a DID</Anchor>
       </p>
       <InfoSection title="Medication">
         <ResourceTable value={med} ignoreMissingValues />
       </InfoSection>
-      <RenewalModal prev={med} opened={modalOpen} setOpened={setModalOpen} />
+      <DIDModal prev={med} opened={modalOpen} setOpened={setModalOpen} />
     </Box>
   );
 }
 
-function RenewalModal({
+function DIDModal({
   prev,
   opened,
   setOpened,
@@ -39,6 +39,12 @@ function RenewalModal({
 }): JSX.Element {
   const medplum = useMedplum();
   const patient = medplum.getProfile();
+
+  const handleRequestDID = async () => {
+    console.log(prev)
+    setOpened(false)
+  };
+
   return (
     <Modal
       size="lg"
@@ -55,7 +61,7 @@ function RenewalModal({
           name="Dosage Instructions"
           value={prev.dosageInstruction?.[0]?.timing && formatTiming(prev.dosageInstruction[0].timing)}
         />
-        <Button onClick={() => setOpened(false)}>Submit Renewal Request</Button>
+        <Button onClick={() => handleRequestDID()}>Submit DID Request</Button>
       </Stack>
     </Modal>
   );
