@@ -17,8 +17,8 @@ export function Medication(): JSX.Element {
       <Title order={2}>{med.medicationCodeableConcept?.text}</Title>
       <p className="mb-6 text-lg text-gray-600">To refill this medication, please contact your pharmacy.</p>
       <p className="mb-6 text-lg text-gray-600">
-        Need to create a DID for this record?{' '}
-        <Anchor onClick={() => setModalOpen(true)}>Request a DID</Anchor>
+        Need to create a Verifiable Credential for this record?{' '}
+        <Anchor onClick={() => setModalOpen(true)}>Request a VC</Anchor>
       </p>
       <InfoSection title="Medication">
         <ResourceTable value={med} ignoreMissingValues />
@@ -50,7 +50,7 @@ function DIDModal({
       size="lg"
       opened={opened}
       onClose={() => setOpened(false)}
-      title={<Title order={3}>Request a Renewal</Title>}
+      title={<span style={{ fontSize: '24px', fontWeight: 'bold' }}>Request a Renewal</span>}
     >
       <Stack spacing="md">
         <KeyValue name="Patient" value={formatHumanName(patient?.name?.[0] as HumanName)} />
@@ -61,7 +61,7 @@ function DIDModal({
           name="Dosage Instructions"
           value={prev.dosageInstruction?.[0]?.timing && formatTiming(prev.dosageInstruction[0].timing)}
         />
-        <Button onClick={() => handleRequestDID()}>Submit DID Request</Button>
+        <Button onClick={() => handleRequestDID()}>Submit VC Request</Button>
       </Stack>
     </Modal>
   );

@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import DoctorImage from '../img/homePage/doctor.svg';
 import HealthRecordImage from '../img/homePage/health-record.svg';
 import HealthVisitImage from '../img/homePage/health-visit.jpg';
-import HeroImage from '../img/homePage/hero-background.jpg';
+import HeroImage from '../img/homePage/photo-1682685797406-97f364419b4a.avif';
 import PharmacyImage from '../img/homePage/pharmacy.svg';
 import PillImage from '../img/homePage/pill.svg';
 
@@ -43,6 +43,7 @@ const useStyles = createStyles((theme) => ({
     backgroundImage: `url(${HeroImage})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundAlt: 'hiking woman standing between rock walls'
   },
 
   heroContainer: {
@@ -106,31 +107,31 @@ const carouselItems = [
     img: <IconChecklist />,
     title: 'Welcome to HMS',
     description:
-      'Lorem ipsum at porta donec ultricies ut, arcu morbi amet arcu ornare, curabitur pharetra magna tempus',
+      'Advanced healthcare platform to provide faster care when you need it most.',
     url: '/get-care',
     label: 'Learn how we help',
   },
   {
     img: <IconChecklist />,
-    title: 'Verify Email',
+    title: 'Verifiable Records',
     description:
-      'Lorem ipsum at porta donec ultricies ut, arcu morbi amet arcu ornare, curabitur pharetra magna tempus',
+      'Create verifiable credentials and securely share with providers or verifiers.',
     url: '/account',
-    label: 'Send verification email',
+    label: 'Learn more about DIDs and ZKP',
   },
   {
     img: <IconChecklist />,
-    title: 'Select a Doctor',
+    title: 'Verify Health Providers',
     description:
-      'Lorem ipsum at porta donec ultricies ut, arcu morbi amet arcu ornare, curabitur pharetra magna tempus',
-    url: '/account/provider/choose-a-primary-care-povider',
-    label: 'Choose a Primary Care Provider',
+      'Verify credentials of a doctor or other healthcare providers to give you the best care you deserve.',
+    url: '/account/provider/choose-a-primary-care-provider',
+    label: 'Find a Primary Care Provider',
   },
   {
     img: <IconChecklist />,
     title: 'Emergency Contact',
     description:
-      'Lorem ipsum at porta donec ultricies ut, arcu morbi amet arcu ornare, curabitur pharetra magna tempus',
+      'Add or Update your emergency records to help your loved ones in case of an emergency.',
     url: '/account',
     label: 'Add emergency contact',
   },
@@ -145,7 +146,7 @@ const linkPages = [
   },
   {
     img: PillImage,
-    title: 'Request Prescription Renewal',
+    title: 'Verifiable Credentials',
     description: '',
     href: '/health-record/medications',
   },
@@ -183,7 +184,7 @@ export function HomePage(): JSX.Element {
     <>
       <Box className={classes.announcements}>
         <span>
-          Announcements go here. <Anchor href="#">Include links if needed.</Anchor>
+        Encode Club's Digital Identity Hackathon sponsored by Onyx by J.P. Morgan. <Anchor href="#">Health Management System Project Created By Chris Salvador.</Anchor>
         </span>
       </Box>
       <div className={classes.hero}>
@@ -228,44 +229,6 @@ export function HomePage(): JSX.Element {
               </Grid.Col>
             ))}
           </Grid>
-        </Container>
-      </Box>
-      <Box p="lg" bg="gray.0">
-        <Container>
-          <Card shadow="md" radius="md" className={classes.card} p="xl">
-            <IconSquareCheck />
-            <Text size="lg" weight={500} mt="md">
-              Better rest, better health
-            </Text>
-            <Text size="sm" color="dimmed" my="sm">
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque, iste
-              dolor cupiditate blanditiis ratione. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores
-              impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.
-            </Text>
-            <Button>Invite Friends</Button>
-          </Card>
-        </Container>
-      </Box>
-      <Box p="lg" bg="gray.0">
-        <Container>
-          <Card shadow="md" radius="md" className={classes.card} p="xl">
-            <Flex>
-              <Image src={HealthVisitImage} m="-30px 30px -30px -30px" />
-              <div>
-                <Badge color={theme.primaryColor} size="xl">
-                  Now available
-                </Badge>
-                <Text size="lg" weight={500} mt="md">
-                  Title
-                </Text>
-                <Text size="sm" color="dimmed" my="sm">
-                  Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores impedit perferendis suscipit eaque,
-                  iste dolor cupiditate blanditiis ratione. Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                  Maiores impedit perferendis suscipit eaque, iste dolor cupiditate blanditiis ratione.
-                </Text>
-              </div>
-            </Flex>
-          </Card>
         </Container>
       </Box>
       <Box p="lg" bg="gray.0">

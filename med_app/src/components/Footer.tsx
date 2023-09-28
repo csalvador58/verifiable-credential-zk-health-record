@@ -23,13 +23,13 @@ export function Footer(): JSX.Element {
           <Stack spacing="xl">
             <SimpleGrid cols={4}>
               <Anchor href="https://www.medplum.com/docs/tutorials/api-basics/create-fhir-data">Getting started</Anchor>
-              <Anchor href="https://www.medplum.com/docs/tutorials">Playing with Medplum</Anchor>
+              <Anchor href="https://www.medplum.com/docs/tutorials">Building with Medplum</Anchor>
               <Anchor href="https://github.com/medplum/foomedical">Open Source</Anchor>
               <Anchor href="https://www.medplum.com/docs">Documentation</Anchor>
             </SimpleGrid>
             <Divider />
             <Text color="dimmed" size="sm">
-              &copy; {new Date().getFullYear()} Health Management System, Inc. All rights reserved.
+              &copy; {new Date().getFullYear()} Health Management System, Inc. A healthcare project by Chris Salvador. All rights reserved.
             </Text>
           </Stack>
         </Container>
