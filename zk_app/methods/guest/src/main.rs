@@ -15,6 +15,7 @@ pub fn main() {
 
     // Privately load the verifiable credential from the host
     let verifiable_credential: String = env::read();
+    
     // Hash the verifiable credential
     let sha_verifiable_credential: risc0_zkvm::sha::Digest = *Impl::hash_bytes(&verifiable_credential.as_bytes());
     //
