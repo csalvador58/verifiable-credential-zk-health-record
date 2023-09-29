@@ -5,6 +5,7 @@ import { ResourceTable, useMedplum } from '@medplum/react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
+import { ONYX_API } from '../../config';
 
 export function Medication(): JSX.Element {
   const medplum = useMedplum();
@@ -43,9 +44,25 @@ function DIDModal({
 
   const handleVCRequest = async () => {
     console.log(prev);
-    setLoading(true);
-    // const vc = createVc(prev);
-    // console.log(vc);
+    const healthRecord = prev;
+    const url = `${ONYX_API}/create-signed-vc`;
+    const method = 'POST';
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(healthRecord),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(`${response.status}: ${response.statusText}, ${data.error}`);
+    }
+    const data = await response.json();
+    console.log(data.message);
+
+    setLoading(false);
   };
 
   return (

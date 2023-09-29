@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "declaration": true,
+    "strict": true,
+    "target": "es6",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "src/api/app.ts"],
+  "exclude": ["node_modules", "tests"]
+}

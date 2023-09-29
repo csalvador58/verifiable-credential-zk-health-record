@@ -1,0 +1,54 @@
+{
+  "name": "@jpmorganchase/onyx-ssi-sdk-examples",
+  "version": "0.0.1",
+  "description": "This repo has running code which you can execute to help you understand how to use the onyx-ssi-sdk.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpmorganchase/onyx-ssi-sdk-examples"
+  },
+  "scripts": {
+    "dev": "nodemon ./src/api/app.ts",
+    "create:issuer:did:key": "ts-node ./src/issuer/create-issuer-did-key.ts",
+    "create:issuer:did:ethr": "ts-node ./src/issuer/create-issuer-did-ethr.ts",
+    "create:keypair": "ts-node ./src/holder/create-keypair.ts",
+    "create:sign:vc": "ts-node ./src/issuer/create-and-sign-vc.ts",
+    "create:sign:vp": "ts-node ./src/holder/create-and-sign-vp.ts",
+    "create:vc": "ts-node ./src/issuer/create-vc.ts",
+    "create:vc:did:ethr": "ts-node ./src/issuer/create-vc-did-ethr.ts",
+    "create:vc:schema:validation": "ts-node ./src/issuer/create-vc-schema-validation.ts",
+    "create:vc:with:additional:params": "ts-node ./src/issuer/create-vc-with-additional-params.ts",
+    "create:vp": "ts-node ./src/holder/create-vp-from-vc.ts",
+    "create:vp:with:additional:params": "ts-node ./src/holder/create-vp-with-additional-params.ts",
+    "deactivate:vc": "ts-node ./src/issuer/deactivate-vc.ts",
+    "sign:vc": "ts-node ./src/issuer/sign-vc.ts",
+    "sign:vp": "ts-node ./src/holder/sign-vp.ts",
+    "verify": "ts-node ./src/verifier/verify.ts",
+    "verify:dates": "ts-node ./src/verifier/verify-dates.ts",
+    "verify:revocation:status": "ts-node ./src/verifier/verify-revocation-status.ts",
+    "verify:schema:validation": "ts-node ./src/verifier/verify-schema-validation.ts",
+    "claim": "ts-node ./src/hackathon-scripts/claim.ts",
+    "present": "ts-node ./src/hackathon-scripts/present-vc.ts"
+  },
+  "author": "",
+  "devDependencies": {
+    "@types/node": "^18.18.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@jpmorganchase/onyx-ssi-sdk": "^0.0.1",
+    "@types/cors": "^2.8.14",
+    "@types/express": "^4.17.18",
+    "@types/lodash": "^4.14.194",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "jsontokens": "^4.0.1",
+    "lodash": "^4.17.21"
+  }
+}

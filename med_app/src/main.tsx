@@ -31,7 +31,7 @@ const theme: MantineThemeOverride = {
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
-  <StrictMode>
+  // <StrictMode>
     <BrowserRouter>
       <MedplumProvider medplum={medplum}>
         <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
@@ -39,5 +39,5 @@ root.render(
         </MantineProvider>
       </MedplumProvider>
     </BrowserRouter>
-  </StrictMode>
+  // </StrictMode>
 );
