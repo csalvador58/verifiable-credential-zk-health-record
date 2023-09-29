@@ -60,7 +60,8 @@ function DIDModal({
     setSignedVC(['', false]);
 
     try {
-      const healthRecord = prev;
+      const healthRecord = {...prev};
+      console.log(healthRecord);
       const url = `${ONYX_API}/create-signed-vc`;
       const method = 'POST';
 

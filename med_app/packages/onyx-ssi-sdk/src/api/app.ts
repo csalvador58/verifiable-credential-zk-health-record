@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, Express } from 'express';
-import { createVc } from '../issuer/create-and-sign-vc';
+import { createVc } from '../issuer/create-and-sign-vc_with_schema_params';
 import cors from 'cors';
 
 const app: Express = express();
