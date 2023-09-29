@@ -2,15 +2,19 @@ import { Anchor, Box, Button, Modal, Stack, Text, Title } from '@mantine/core';
 import { formatDateTime, formatHumanName, formatTiming } from '@medplum/core';
 import { HumanName, MedicationRequest } from '@medplum/fhirtypes';
 import { ResourceTable, useMedplum } from '@medplum/react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import { ONYX_API } from '../../config';
+import { ToastContainer, toast } from 'react-toastify';
+
+type SignedVC = [string, boolean];
 
 export function Medication(): JSX.Element {
   const medplum = useMedplum();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const { medicationId = '' } = useParams();
+  const [signedVC, setSignedVC] = useState<SignedVC>(['', false]);
   const med: MedicationRequest = medplum.readResource('MedicationRequest', medicationId).read();
 
   return (
@@ -24,7 +28,13 @@ export function Medication(): JSX.Element {
       <InfoSection title="Medication">
         <ResourceTable value={med} ignoreMissingValues />
       </InfoSection>
-      <DIDModal prev={med} opened={modalOpen} setOpened={setModalOpen} />
+      <DIDModal prev={med} opened={modalOpen} setOpened={setModalOpen} signedVC={signedVC} setSignedVC={setSignedVC} />
+      {signedVC[1] && (
+        <>
+          <div>Signed Verifiable Credential</div>
+          <div>{signedVC[0]}</div>
+        </>
+      )}
     </Box>
   );
 }
@@ -33,36 +43,56 @@ function DIDModal({
   prev,
   opened,
   setOpened,
+  signedVC,
+  setSignedVC,
 }: {
   prev: MedicationRequest;
   opened: boolean;
   setOpened: (o: boolean) => void;
+  signedVC: SignedVC;
+  setSignedVC: (o: SignedVC) => void;
 }): JSX.Element {
   const medplum = useMedplum();
   const patient = medplum.getProfile();
-  const [loading, setLoading] = useState<boolean>(false);
 
+  // Fetch signed VC from issuer
   const handleVCRequest = async () => {
-    console.log(prev);
-    const healthRecord = prev;
-    const url = `${ONYX_API}/create-signed-vc`;
-    const method = 'POST';
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(healthRecord),
-    });
+    setSignedVC(['', false]);
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(`${response.status}: ${response.statusText}, ${data.error}`);
+    try {
+      const healthRecord = prev;
+      const url = `${ONYX_API}/create-signed-vc`;
+      const method = 'POST';
+
+      const data = await toast
+        .promise(
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(healthRecord),
+          }),
+          {
+            pending: 'Requesting VC...',
+            success: 'VC Requested!',
+            error: 'Error requesting VC.',
+          },
+          { autoClose: false }
+        )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          setTimeout(() => {
+            setOpened(false);
+            setSignedVC([data.message, true]);
+          }, 1000);
+          return response.json();
+        });
+    } catch (error) {
+      console.error(error);
     }
-    const data = await response.json();
-    console.log(data.message);
-
-    setLoading(false);
   };
 
   return (
@@ -81,8 +111,9 @@ function DIDModal({
           name="Dosage Instructions"
           value={prev.dosageInstruction?.[0]?.timing && formatTiming(prev.dosageInstruction[0].timing)}
         />
-        {!loading && <Button onClick={() => handleVCRequest()}>Submit VC Request</Button>}
+        {!!signedVC && <Button onClick={async () => await handleVCRequest()}>Submit VC Request</Button>}
       </Stack>
+      <ToastContainer />
     </Modal>
   );
 }
