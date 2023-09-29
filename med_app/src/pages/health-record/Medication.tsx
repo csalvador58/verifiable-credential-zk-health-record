@@ -39,10 +39,13 @@ function DIDModal({
 }): JSX.Element {
   const medplum = useMedplum();
   const patient = medplum.getProfile();
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleRequestDID = async () => {
-    console.log(prev)
-    setOpened(false)
+  const handleVCRequest = async () => {
+    console.log(prev);
+    setLoading(true);
+    // const vc = createVc(prev);
+    // console.log(vc);
   };
 
   return (
@@ -61,7 +64,7 @@ function DIDModal({
           name="Dosage Instructions"
           value={prev.dosageInstruction?.[0]?.timing && formatTiming(prev.dosageInstruction[0].timing)}
         />
-        <Button onClick={() => handleRequestDID()}>Submit VC Request</Button>
+        {!loading && <Button onClick={() => handleVCRequest()}>Submit VC Request</Button>}
       </Stack>
     </Modal>
   );
