@@ -60,7 +60,7 @@ function DIDModal({
     setSignedVC(['', false]);
 
     try {
-      const healthRecord = {...prev};
+      const healthRecord = { ...prev };
       console.log(healthRecord);
       const url = `${ONYX_API}/create-signed-vc`;
       const method = 'POST';
@@ -72,7 +72,7 @@ function DIDModal({
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(healthRecord),
+            body: JSON.stringify({ fhir: healthRecord }),
           }),
           {
             pending: 'Requesting VC...',

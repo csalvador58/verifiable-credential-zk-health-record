@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
     println!("Server has been started on http://localhost:8000");
 
     HttpServer::new(move || App::new().service(create_zkp_medical_request))
-        .bind(("127.0.0.1", 8000))?
+        .bind(("127.0.0.1", 8080))?
         .run()
         .await
 }
@@ -54,6 +54,7 @@ async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Res
         },
     };
 
+    // let response = serde_json::to_string(&new_vc).unwrap();
     let new_vc_to_string = serde_json::to_string(&new_vc).unwrap();
     let zkp_receipt = zkvm_host(&new_vc_to_string);
     let response = format!(
