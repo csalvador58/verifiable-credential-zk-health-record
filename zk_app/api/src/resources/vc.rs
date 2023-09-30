@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use actix_web::{
@@ -5,7 +6,6 @@ use actix_web::{
     http::{header::ContentType, StatusCode},
     HttpRequest, HttpResponse, Responder, ResponseError,
 };
-use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
 #[derive(Serialize, Deserialize)]
@@ -55,7 +55,3 @@ impl Display for ErrorResponse {
         write!(f, "{:?}", self)
     }
 }
-
-// struct AppState {
-//     verifiable_credentials: Mutex<Vec<VerifiableCredential>>,
-// }

@@ -145,7 +145,7 @@ const features = [
   {
     title: 'Created on the Medplum platform',
     description:
-      `Open source project focused on FHIR standards while providing a secure and compliant data infrastructure layer. Organizations that support FHIR include EPIC Systems, SMART, CommonWell Health Alliance, and even Apple with the iPhone Health App.`,
+      `Open source project focused on FHIR standards while providing a secure and compliant data infrastructure layer. Organizations that support FHIR include EPIC Systems, SMART, CommonWell Health Alliance, and Apple's iPhone Health App.`,
   },
   {
     title: 'Generate DIDs on demand',

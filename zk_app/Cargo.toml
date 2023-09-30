@@ -3,7 +3,6 @@ members = [
     "api",
     "host",
     "methods",
-    "api",
 ]
 resolver = "2"
 

@@ -11,7 +11,7 @@ import { HOLDER_EDDSA_PRIVATE_KEY, ISSUER_EDDSA_PRIVATE_KEY, VC_SCHEMA_URL } fro
 import { privateKeyBufferFromString } from '../utils/convertions';
 
 const jwtService = new JWTService();
-const signVc = async (issuerDidWithKeys: DIDWithKeys, vc: any) => {
+const signVc = async (issuerDidWithKeys: any, vc: any) => {
   return jwtService.signVC(issuerDidWithKeys, vc);
 };
 
@@ -52,6 +52,8 @@ export const createVc = async (fhirResource: any) => {
   if (validation) {
     console.log(`\nGenerating Verifiable Credential of type ${credentialType}\n`);
 
+    console.log("issuerDidWithKeys.did", issuerDidWithKeys.did)
+    console.log("holderDidWithKeys.did", holderDidWithKeys.did)
     const vc = await createCredentialFromSchema(
       VC_SCHEMA_URL!,
       issuerDidWithKeys.did,

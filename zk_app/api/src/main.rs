@@ -17,18 +17,27 @@ use std::sync::Mutex;
 
 mod resources;
 
+#[derive(Serialize, Deserialize, Debug)]
+struct ZKResponse {
+    hash: String,
+    verifiable_data_1: String,
+    verifiable_data_2: String,
+    verifiable_data_3: String,
+    verifiable_data_4: String,
+    verifiable_data_5: String,
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     println!("Server has been started on http://localhost:8000");
 
-    HttpServer::new(move || App::new().service(create_zkp))
+    HttpServer::new(move || App::new().service(create_zkp_medical_request))
         .bind(("127.0.0.1", 8000))?
         .run()
         .await
 }
 
 // handle routes
-// TODO: add more routes
 #[post("/zkp/create")]
 async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Responder {
     let new_vc = resources::VerifiableCredential {
@@ -45,13 +54,12 @@ async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Res
         },
     };
 
-    // let response = serde_json::to_string(&new_vc).unwrap();
     let new_vc_to_string = serde_json::to_string(&new_vc).unwrap();
     let zkp_receipt = zkvm_host(&new_vc_to_string);
     let response = format!(
         "{{\"hash\": {:?}, \"verifiable_data\": {:?}}}",
         zkp_receipt.hash,
-        String::from_utf8(zkp_receipt.verifiable_data).unwrap()
+        String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
     );
 
     HttpResponse::Created()
@@ -59,10 +67,86 @@ async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Res
         .body(response)
 }
 
-/*
-{"hash": Digest(1ef1cbfb2293b8915abad89364c54f931d176cf6237ce6343dd4590fb848357a), 
-"verifiable_data": "secret sauce"}
 
-{"hash": Digest(0d734f1cbd7048e796ae0ae9d4885848a4eaaa30be2aeb299827e7e7fb24b834), 
-"verifiable_data": "secret"}
-*/
+#[post("/zkp/create-medication-request")]
+async fn create_zkp_medical_request(
+    req: web::Json<resources::MedicationRequest>,
+) -> impl Responder {
+    let new_med_request = resources::MedicationRequest {
+        id: String::from(&req.id),
+        meta: resources::Meta {
+            profile: req.meta.profile.iter().map(|s| String::from(s)).collect(),
+            versionId: String::from(&req.meta.versionId),
+            lastUpdated: String::from(&req.meta.lastUpdated),
+            author: resources::Author {
+                reference: String::from(&req.meta.author.reference),
+                display: String::from(&req.meta.author.display),
+            },
+            project: String::from(&req.meta.project),
+            compartment: match &req.meta.compartment {
+                Some(c) => Some(
+                    c.iter()
+                        .map(|s| resources::Compartment {
+                            reference: String::from(&s.reference),
+                        })
+                        .collect(),
+                ),
+                None => None,
+            },
+        },
+        status: String::from(&req.status),
+        intent: String::from(&req.intent),
+        medicationCodeableConcept: resources::MedicationCodeableConcept {
+            coding: req
+                .medicationCodeableConcept
+                .coding
+                .iter()
+                .map(|s| resources::Coding {
+                    system: String::from(&s.system),
+                    code: String::from(&s.code),
+                    display: String::from(&s.display),
+                })
+                .collect(),
+            text: String::from(&req.medicationCodeableConcept.text),
+        },
+        subject: resources::Subject {
+            reference: String::from(&req.subject.reference),
+        },
+        encounter: resources::Encounter {
+            reference: String::from(&req.encounter.reference),
+        },
+        authoredOn: String::from(&req.authoredOn),
+        requester: resources::Requester {
+            reference: String::from(&req.requester.reference),
+            display: String::from(&req.requester.display),
+        },
+        reasonReference: req
+            .reasonReference
+            .iter()
+            .map(|s| resources::ReasonReference {
+                reference: String::from(&s.reference),
+            })
+            .collect(),
+        resourceType: String::from(&req.resourceType),
+    };
+
+    let new_med_request_to_string = serde_json::to_string(&new_med_request).unwrap();
+    let zkp_receipt = zkvm_host(&new_med_request_to_string);
+
+    let response: ZKResponse = ZKResponse {
+        hash: format!("{:?}", zkp_receipt.hash),
+        verifiable_data_1: String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
+        verifiable_data_2: String::from_utf8(zkp_receipt.verifiable_data_2).unwrap(),
+        verifiable_data_3: String::from_utf8(zkp_receipt.verifiable_data_3).unwrap(),
+        verifiable_data_4: String::from_utf8(zkp_receipt.verifiable_data_4).unwrap(),
+        verifiable_data_5: String::from_utf8(zkp_receipt.verifiable_data_5).unwrap(),
+    };
+
+
+    HttpResponse::Ok()
+        .content_type(ContentType::json())
+        .json(response)
+    // HttpResponse::Created()
+    //     .content_type(ContentType::json())
+    //     .body(response)
+}
