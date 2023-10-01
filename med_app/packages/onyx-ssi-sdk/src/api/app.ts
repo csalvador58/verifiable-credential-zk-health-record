@@ -65,32 +65,12 @@ app.post('/create-signed-vc', async (req: Request, res: Response, next: NextFunc
 });
 
 app.post('/create-signed-vp', async (req: Request, res: Response, next: NextFunction) => {
-  const { issuerSignedVerifiableCredential, fhirHealthRecord } = req.body;
+  console.log(req.body.vc);
+  // console.log('issuerSignedVerifiableCredential', issuerSignedVerifiableCredential);
 
-  // Fetch zk proof from zkvm
-  try {
-    const url = `http://127.0.0.1:8080/zkp/create-medication-request`;
-    const method = 'POST';
-    const zkReceipt = await fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(fhirHealthRecord),
-    }).then(async (response) => {
-      if (!response.ok) {
-        throw new Error(response.statusText);
-      }
-
-      const zkProof = await response.json();
-
-      const signedVp = await createAndSignVp(zkProof, issuerSignedVerifiableCredential);
+      const signedVp = await createAndSignVp(req.body.vc);
       res.send({ message: signedVp });
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({ message: 'Internal server error' });
-  }
+  
 });
 
 export default app;

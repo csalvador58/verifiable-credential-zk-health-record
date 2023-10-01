@@ -18,23 +18,14 @@ export function VcItem(): JSX.Element {
 
   const resource = vcs.find((vc: any) => vc.id === itemId)!;
 
-  const test = resource.vc_raw.credentialSubject.medicationCodeableConcept;
-  console.log('test');
-  console.log(test);
-
-  const test5 = JSON.parse(test);
-  console.log('test5');
-  console.log(test5);
-
-
   const handleVPRequest = async () => {
     setSignedVC(['', false]);
 
-    console.log(resource.vc_raw.credentialSubject);
+    console.log(resource);
 
     try {
-      const fhirHealthRecord = { ...resource.vc_raw.credentialSubject };
-      const issuerSignedVerifiableCredential = resource.vc_signed;
+      const signedVCJwt = resource.vc_signed;
+      console.log(signedVCJwt);
       const url = `${ONYX_API}/create-signed-vp`;
       const method = 'POST';
 
@@ -45,7 +36,7 @@ export function VcItem(): JSX.Element {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ issuerSignedVerifiableCredential, fhirHealthRecord }),
+            body: JSON.stringify({ vc: signedVCJwt }),
           }),
           {
             pending: 'Requesting VC...',
@@ -79,7 +70,10 @@ export function VcItem(): JSX.Element {
           <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
           <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
           <Divider />
-          <KeyValue name="Medication Request" value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text} />
+          <KeyValue
+            name="Medication Request"
+            value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text}
+          />
           <Divider />
           <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
           <Divider />
