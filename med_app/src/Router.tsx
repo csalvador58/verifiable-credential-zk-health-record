@@ -3,9 +3,9 @@ import { AccountPage } from './pages/account';
 import { MembershipAndBilling } from './pages/account/MembershipAndBilling';
 import { Profile } from './pages/account/Profile';
 import { Provider } from './pages/account/Provider';
-import { DIDMainPage } from './pages/did';
-import { DIDItem } from './pages/did/DIDItem';
-import { DIDItems } from './pages/did/DIDItems';
+import { VcMainPage } from './pages/vc';
+import { VcItem } from './pages/vc/VcItem';
+import { VcItems } from './pages/vc/VcItems';
 import { GetCare } from './pages/GetCarePage';
 import { HealthRecord } from './pages/health-record';
 import { LabResult } from './pages/health-record/LabResult';
@@ -39,11 +39,11 @@ export function Router(): JSX.Element {
         <Route path="vitals/:measurementId" element={<Measurement />} />
       </Route>
       <Route path="Observation/:observationId" element={<ObservationPage />} />
-      <Route path="did-main/*" element={<DIDMainPage />}>
-        <Route index element={<Navigate replace to="/did-main/DID-items" />} />
-        <Route path="DID-items" element={<DIDItems />} />
-        <Route path="DID-items/:itemId" element={<DIDItem />} />
-        <Route path="DID-items/login" element={<BiconomyLogin />} />
+      <Route path="vc-main/*" element={<VcMainPage />}>
+        <Route index element={<Navigate replace to="/vc-main/vc-items" />} />
+        <Route path="vc-items" element={<VcItems />} />
+        <Route path="vc-items/:itemId" element={<VcItem />} />
+        <Route path="vc-items/login" element={<BiconomyLogin />} />
       </Route>
       <Route path="get-care/*" element={<GetCare />} />
       <Route path="account/*" element={<AccountPage />}>

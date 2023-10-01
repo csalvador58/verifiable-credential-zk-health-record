@@ -1,14 +1,14 @@
-export const dids = [
+export const vcs = [
     {
       'id':'1234',
       resourceType:'CarePlan',
-      title:'DID 1',
+      title:'VC 1',
       status:'active',
     },
     {
       id:'5678',
       resourceType:'CarePlan',
-      title:'DID 2',
+      title:'VC 2',
       status:'active',
-    }
+    },
 ]

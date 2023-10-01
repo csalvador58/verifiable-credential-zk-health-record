@@ -148,14 +148,14 @@ const features = [
       `Open source project focused on FHIR standards while providing a secure and compliant data infrastructure layer. Organizations that support FHIR include EPIC Systems, SMART, CommonWell Health Alliance, and Apple's iPhone Health App.`,
   },
   {
-    title: 'Generate DIDs on demand',
+    title: 'Generate VCs on demand',
     description:
-      'Use standard templates generate a DID based on your personal health records.',
+      'Use standard templates generate a VC based on your personal health records.',
   },
   {
     title: 'Create Verifiable Presentations',
     description:
-      'Easily select available DIDs to generate a verifiable presentation for verifiers.',
+      'Easily select available VCs to generate a verifiable proof for verifiers.',
   },
   {
     title: 'Zero Knowledge',

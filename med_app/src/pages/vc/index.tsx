@@ -13,23 +13,23 @@ import { SideMenu } from '../../components/SideMenu';
 //   ],
 // };
 
-export function DIDMainPage(): JSX.Element {
+export function VcMainPage(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const sideMenu = !isLoggedIn ? 
     {
       title: 'Menu',
       menu: [
-        { name: 'Login', href: '/did-main/DID-items/login' },
-        { name: 'View List', href: '/did-main/DID-items' },
-        { name: 'Create', href: '/did-main/create' },
+        { name: 'Login', href: '/vc-main/vc-items/login' },
+        { name: 'View List', href: '/vc-main/vc-items' },
+        { name: 'Create', href: '/vc-main/create' },
       ],
     } :
     {
       title: 'Menu',
       menu: [
-        { name: 'View List', href: '/did-main/DID-items' },
-        { name: 'Create', href: '/did-main/create' },
+        { name: 'View List', href: '/vc-main/vc-items' },
+        { name: 'Create', href: '/vc-main/create' },
       ],
     };
 

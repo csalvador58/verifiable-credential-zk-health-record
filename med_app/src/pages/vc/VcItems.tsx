@@ -6,9 +6,10 @@ import { IconCalendar } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
-import { dids } from './dids';
+// import { vcs } from './vcs';
+import vcs from './vc_store/medicationRequest_vc.json';
 
-export function DIDItems(): JSX.Element {
+export function VcItems(): JSX.Element {
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const medplum = useMedplum();
@@ -17,10 +18,10 @@ export function DIDItems(): JSX.Element {
 
   return (
     <Box p="xl">
-      <Title mb="lg">Decentralized IDs</Title>
-      <InfoSection title="DIDs">
+      <Title mb="lg">Verifiable Credentials</Title>
+      <InfoSection title="Available VCs">
         <Stack spacing={0}>
-          {dids.map((resource) => (
+          {vcs.map((resource: any) => (
             <InfoButton key={resource.id} onClick={() => navigate(`./${resource.id}`)}>
             {/* <InfoButton key={resource.id} onClick={() => null}> */}
               <div>

@@ -9,6 +9,8 @@ import { camelCase } from 'lodash';
 import path from 'path';
 import { HOLDER_EDDSA_PRIVATE_KEY, ISSUER_EDDSA_PRIVATE_KEY, VC_SCHEMA_URL } from '../../config';
 import { privateKeyBufferFromString } from '../utils/convertions';
+import { writeToFile } from '../utils/writer';
+import { v4 as uuidv4 } from 'uuid';
 
 const jwtService = new JWTService();
 const signVc = async (issuerDidWithKeys: any, vc: any) => {
@@ -25,7 +27,7 @@ export const createVc = async (fhirResource: any) => {
   const vcDidKey = (await didKey.create()).did;
 
   // const credentialType = "PROOF_OF_ADDRESS";
-  const credentialType = fhirResource.resourceType;
+  const credentialType = fhirResource.fhir.resourceType;
 
   const subjectData = {
     ...fhirResource,
@@ -52,8 +54,8 @@ export const createVc = async (fhirResource: any) => {
   if (validation) {
     console.log(`\nGenerating Verifiable Credential of type ${credentialType}\n`);
 
-    console.log("issuerDidWithKeys.did", issuerDidWithKeys.did)
-    console.log("holderDidWithKeys.did", holderDidWithKeys.did)
+    console.log('issuerDidWithKeys.did', issuerDidWithKeys.did);
+    console.log('holderDidWithKeys.did', holderDidWithKeys.did);
     const vc = await createCredentialFromSchema(
       VC_SCHEMA_URL!,
       issuerDidWithKeys.did,
@@ -70,6 +72,13 @@ export const createVc = async (fhirResource: any) => {
     console.log('\nSigning the VC\n');
     const signedVc = await signVc(issuerDidWithKeys, vc);
     console.log(signedVc);
+
+    console.log('path: ', path.resolve('../../src/pages/vc_store/'));
+
+    writeToFile(
+      path.resolve(`../../src/pages/vc/store`, `${camelCase(credentialType)}_vc.json`),
+      JSON.stringify([{ id: uuidv4(), vc: signedVc }], null, 2)
+    );
 
     return signedVc;
   } else {

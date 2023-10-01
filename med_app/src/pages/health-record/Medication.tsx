@@ -28,7 +28,7 @@ export function Medication(): JSX.Element {
       <InfoSection title="Medication">
         <ResourceTable value={med} ignoreMissingValues />
       </InfoSection>
-      <DIDModal prev={med} opened={modalOpen} setOpened={setModalOpen} signedVC={signedVC} setSignedVC={setSignedVC} />
+      <VcModal prev={med} opened={modalOpen} setOpened={setModalOpen} signedVC={signedVC} setSignedVC={setSignedVC} />
       {signedVC[1] && (
         <>
           <div>Signed Verifiable Credential</div>
@@ -39,7 +39,7 @@ export function Medication(): JSX.Element {
   );
 }
 
-function DIDModal({
+function VcModal({
   prev,
   opened,
   setOpened,

@@ -3,22 +3,22 @@ import { CarePlan } from '@medplum/fhirtypes';
 import { ResourceTable, useMedplum } from '@medplum/react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import { dids } from './dids';
+import { vcs } from './vcs';
 
-export function DIDItem(): JSX.Element {
+export function VcItem(): JSX.Element {
   const medplum = useMedplum();
   const { itemId } = useParams();
   // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
 
 
-  const resource = (dids.find((did) => did.id === itemId))!;
+  const resource = (vcs.find((vc: any) => vc.id === itemId))!;
 
   return (
     <Box p="xl">
       <Title order={2} mb="md">
-        DID Details
+        VC Details
       </Title>
-      <InfoSection title="DID">
+      <InfoSection title="VC">
         <ResourceTable value={resource} ignoreMissingValues />
       </InfoSection>
     </Box>
