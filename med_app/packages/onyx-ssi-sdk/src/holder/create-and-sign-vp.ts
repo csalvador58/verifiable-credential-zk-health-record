@@ -18,14 +18,16 @@ import {
 import { privateKeyBufferFromString } from "../utils/convertions";
 import { writeToFile } from "../utils/writer";
 
-const createAndSignVp = async () => {
+export const createAndSignVp = async (vc: any) => {
+  const signedVcJwt = vc;
+
   if (VC) {
     try {
       console.log("\nReading an existing signed VC JWT\n");
-      const signedVcJwt = fs.readFileSync(
-        path.resolve(VC_DIR_PATH, `${camelCase(VC)}.jwt`),
-        "utf8"
-      );
+      // const signedVcJwt = fs.readFileSync(
+      //   path.resolve(VC_DIR_PATH, `${camelCase(VC)}.jwt`),
+      //   "utf8"
+      // );
       console.log(signedVcJwt);
 
       console.log("\nGeting User from VC\n");
@@ -96,4 +98,4 @@ const createAndSignVp = async () => {
   }
 };
 
-createAndSignVp();
+// createAndSignVp();

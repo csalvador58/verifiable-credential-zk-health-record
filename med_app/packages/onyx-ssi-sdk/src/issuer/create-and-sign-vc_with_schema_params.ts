@@ -7,7 +7,7 @@ import {
 } from '@jpmorganchase/onyx-ssi-sdk';
 import { camelCase } from 'lodash';
 import path from 'path';
-import { HOLDER_EDDSA_PRIVATE_KEY, ISSUER_EDDSA_PRIVATE_KEY, VC_SCHEMA_URL } from '../../config';
+import { HOLDER_EDDSA_PRIVATE_KEY, ISSUER_EDDSA_PRIVATE_KEY, VC_SCHEMA_URL, VC_DIR_PATH } from '../../config';
 import { privateKeyBufferFromString } from '../utils/convertions';
 import fs from "fs";
 
@@ -72,10 +72,8 @@ export const createVc = async (fhirResource: any) => {
     const signedVc = await signVc(issuerDidWithKeys, vc);
     console.log(signedVc);
 
-    console.log('path: ', path.resolve('../../src/pages/vc_store/'));
-
     writeToVCStore(
-      path.resolve(`../../src/pages/vc/vc_store`, `${camelCase(credentialType)}_vc.json`),
+      path.resolve(VC_DIR_PATH, `${camelCase(credentialType)}_vc.json`),
       JSON.stringify({ id: vc.id, vc_signed: signedVc, vc_raw: vc }, null, 2)
     );
 

@@ -1,4 +1,4 @@
-import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion } from '@mantine/core';
+import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group } from '@mantine/core';
 import { CarePlan } from '@medplum/fhirtypes';
 import { ResourceTable, StatusBadge, useMedplum } from '@medplum/react';
 import { useParams } from 'react-router-dom';
@@ -15,7 +15,7 @@ export function VcItem(): JSX.Element {
   return (
     <Box p="xl">
       <Title mb="lg">Credential Details</Title>
-      <InfoSection title={"DID: " + resource.id}>
+      <InfoSection title={"ID: " + resource.id}>
         <Stack spacing={0}>
           <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.fhir.resourceType} />
           <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.fhir.authoredOn} />
@@ -25,7 +25,7 @@ export function VcItem(): JSX.Element {
             value={resource.vc_raw.credentialSubject.fhir.medicationCodeableConcept.text}
           />
           <Divider />
-          <AccordionDisplay resource={resource.vc_signed} />
+          <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
           <Divider />
           <StatusBadge status={resource.vc_raw.credentialSubject.fhir.status as string} />
         </Stack>
@@ -47,13 +47,35 @@ function KeyValue({ name, value }: { name: string; value: string | undefined }):
   );
 }
 
-function AccordionDisplay({ resource }: {resource: string}): JSX.Element {
+interface AccordionProps {
+  DIDIssuer: string;
+  VerifiableCredential: string;
+}
+
+function AccordionDisplay({DIDIssuer, VerifiableCredential}: AccordionProps): JSX.Element {
   return (
     <Accordion defaultValue="Signed Verifiable Credential">
-      <Accordion.Item value={resource}>
-        <Accordion.Control >{"Click to View Issued Signed Vendor Credential"}</Accordion.Control>
-        <Accordion.Panel>{resource}</Accordion.Panel>
+      <Accordion.Item value={DIDIssuer}>
+        <Accordion.Control >
+            <AccordionLabel DIDIssuer={DIDIssuer} VerifiableCredential={""} />
+        </Accordion.Control>
+        <Accordion.Panel>{VerifiableCredential}</Accordion.Panel>
       </Accordion.Item>
     </Accordion>
+  );
+}
+
+
+
+function AccordionLabel({DIDIssuer}: AccordionProps): JSX.Element {
+  return (
+    <Group>
+      <div>
+        <Text>{"VC Issuer: " + DIDIssuer}</Text>
+        <Text size="sm" c="dimmed" fw={400}>
+          Click to View Verifiable Encrypted Credential
+        </Text>
+      </div>
+    </Group>
   );
 }

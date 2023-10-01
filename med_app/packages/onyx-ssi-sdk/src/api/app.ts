@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction, Express } from 'express';
 import { createVc } from '../issuer/create-and-sign-vc_with_schema_params';
+import { createAndSignVp } from '../holder/create-and-sign-vp';
 import cors from 'cors';
 
 const app: Express = express();
@@ -36,6 +37,13 @@ app.post('/create-signed-vc', async (req: Request, res: Response, next: NextFunc
   
   const vc = await createVc(fhirResource);
   res.send({ message: vc });
+});
+
+app.post('/create-signed-vp', async (req: Request, res: Response, next: NextFunction) => {
+  const vc = req.body;
+  const signedVp = await createAndSignVp(vc);
+
+  res.send({ message: signedVp });
 });
 
 export default app;
