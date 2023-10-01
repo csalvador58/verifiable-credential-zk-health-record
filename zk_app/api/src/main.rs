@@ -1,5 +1,6 @@
+use actix_cors::Cors;
 use actix_web::body::BoxBody;
-use actix_web::http::header::ContentType;
+use actix_web::http::header::{self, ContentType};
 use actix_web::http::StatusCode;
 use actix_web::{
     delete, get, post, put, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
@@ -8,9 +9,12 @@ use actix_web::{
 use host::zkvm_host;
 use std::env;
 use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
+use zk_methods::VALIDATE_ID;
 
 use serde::{Deserialize, Serialize};
+
+use json_core::Outputs;
+use risc0_zkvm::serde::{from_slice, to_vec};
 
 use std::fmt::Display;
 use std::sync::Mutex;
@@ -25,49 +29,68 @@ struct ZKResponse {
     verifiable_data_3: String,
     verifiable_data_4: String,
     verifiable_data_5: String,
+    verifiable_data_6: String,
+    image_id: [u32; 8],
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Server has been started on http://localhost:8000");
+    println!("Server has been started on http://localhost:8080");
 
-    HttpServer::new(move || App::new().service(create_zkp_medical_request))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    HttpServer::new(move || {
+        App::new()
+            .wrap(
+                actix_cors::Cors::default()
+                    .allowed_origin("http://localhost:3001")
+                    .allowed_methods(vec!["GET", "POST", "PATCH", "DELETE"])
+                    .allowed_headers(vec![header::AUTHORIZATION, header::ACCEPT])
+                    .allowed_header(header::CONTENT_TYPE)
+                    .expose_headers(&[header::CONTENT_DISPOSITION])
+                    .supports_credentials()
+                    .max_age(3600),
+            )
+            .service(create_zkp_medical_request)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
+
+    // HttpServer::new(move || App::new().service(create_zkp_medical_request))
+    //     .bind(("127.0.0.1", 8080))?
+    //     .run()
+    //     .await
 }
 
 // handle routes
-#[post("/zkp/create")]
-async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Responder {
-    let new_vc = resources::VerifiableCredential {
-        boolean_field: req.boolean_field,
-        data: String::from(&req.data),
-        obj_field: resources::ObjectField {
-            string_subfield: String::from(&req.obj_field.string_subfield),
-            array_subfield: req
-                .obj_field
-                .array_subfield
-                .iter()
-                .map(|s| String::from(s))
-                .collect(),
-        },
-    };
+// #[post("/zkp/create")]
+// async fn create_zkp(req: web::Json<resources::VerifiableCredential>) -> impl Responder {
+//     let new_vc = resources::VerifiableCredential {
+//         boolean_field: req.boolean_field,
+//         data: String::from(&req.data),
+//         obj_field: resources::ObjectField {
+//             string_subfield: String::from(&req.obj_field.string_subfield),
+//             array_subfield: req
+//                 .obj_field
+//                 .array_subfield
+//                 .iter()
+//                 .map(|s| String::from(s))
+//                 .collect(),
+//         },
+//     };
 
-    // let response = serde_json::to_string(&new_vc).unwrap();
-    let new_vc_to_string = serde_json::to_string(&new_vc).unwrap();
-    let zkp_receipt = zkvm_host(&new_vc_to_string);
-    let response = format!(
-        "{{\"hash\": {:?}, \"verifiable_data\": {:?}}}",
-        zkp_receipt.hash,
-        String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
-    );
+//     // let response = serde_json::to_string(&new_vc).unwrap();
+//     let new_vc_to_string = serde_json::to_string(&new_vc).unwrap();
+//     let zkp_receipt = zkvm_host(&new_vc_to_string);
+//     let response = format!(
+//         "{{\"hash\": {:?}, \"verifiable_data\": {:?}}}",
+//         zkp_receipt.hash,
+//         String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
+//     );
 
-    HttpResponse::Created()
-        .content_type(ContentType::json())
-        .body(response)
-}
-
+//     HttpResponse::Created()
+//         .content_type(ContentType::json())
+//         .body(response)
+// }
 
 #[post("/zkp/create-medication-request")]
 async fn create_zkp_medical_request(
@@ -134,15 +157,32 @@ async fn create_zkp_medical_request(
     let new_med_request_to_string = serde_json::to_string(&new_med_request).unwrap();
     let zkp_receipt = zkvm_host(&new_med_request_to_string);
 
-    let response: ZKResponse = ZKResponse {
-        hash: format!("{:?}", zkp_receipt.hash),
-        verifiable_data_1: String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
-        verifiable_data_2: String::from_utf8(zkp_receipt.verifiable_data_2).unwrap(),
-        verifiable_data_3: String::from_utf8(zkp_receipt.verifiable_data_3).unwrap(),
-        verifiable_data_4: String::from_utf8(zkp_receipt.verifiable_data_4).unwrap(),
-        verifiable_data_5: String::from_utf8(zkp_receipt.verifiable_data_5).unwrap(),
-    };
+    // transform zkp_receipt to json object as is
+    let zkp_receipt_json_object = serde_json::to_string(&zkp_receipt).unwrap();
 
+    // write response_object to file
+    let mut file = std::fs::File::create("zkp_receipt.json").unwrap();
+    file.write_all(zkp_receipt_json_object.as_bytes()).unwrap();
+
+    //  Deserialize receipt
+    let output: Outputs = from_slice(&zkp_receipt.journal).expect("Failed to deserialize receipt");
+
+    let response: ZKResponse = ZKResponse {
+        hash: format!("{:?}", output.hash),
+        verifiable_data_1: String::from_utf8(output.verifiable_data_1.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_1"),
+        verifiable_data_2: String::from_utf8(output.verifiable_data_2.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_2"),
+        verifiable_data_3: String::from_utf8(output.verifiable_data_3.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_3"),
+        verifiable_data_4: String::from_utf8(output.verifiable_data_4.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_4"),
+        verifiable_data_5: String::from_utf8(output.verifiable_data_5.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_5"),
+        verifiable_data_6: String::from_utf8(output.verifiable_data_6.clone())
+            .expect("Invalid UTF-8 sequence in verifiable_data_6"),
+        image_id: VALIDATE_ID,
+    };
 
     HttpResponse::Ok()
         .content_type(ContentType::json())

@@ -32,3 +32,4 @@ yarn-error.log*
 **/Cargo.lock
 **/methods/guest/Cargo.lock
 **/target/
+**zk_app/zkp_receipt.json

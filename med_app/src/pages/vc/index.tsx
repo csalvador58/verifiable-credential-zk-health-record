@@ -21,15 +21,15 @@ export function VcMainPage(): JSX.Element {
       title: 'Menu',
       menu: [
         { name: 'Login', href: '/vc-main/vc-items/login' },
-        { name: 'View List', href: '/vc-main/vc-items' },
-        { name: 'Create', href: '/vc-main/create' },
+        { name: 'View Verifiable Credentials', href: '/vc-main/vc-items' },
+        { name: 'Share Proof of Credentials', href: '/vc-main/vp-items' },
       ],
     } :
     {
       title: 'Menu',
       menu: [
-        { name: 'View List', href: '/vc-main/vc-items' },
-        { name: 'Create', href: '/vc-main/create' },
+        { name: 'Create Verifiable Credentials', href: '/vc-main/vc-items' },
+        { name: 'Share Proof of Credentials', href: '/vc-main/vp-items' },
       ],
     };
 

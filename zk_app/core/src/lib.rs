@@ -8,5 +8,6 @@ pub struct Outputs {
     pub verifiable_data_3: Vec<u8>,
     pub verifiable_data_4: Vec<u8>,
     pub verifiable_data_5: Vec<u8>,
+    pub verifiable_data_6: Vec<u8>,
     pub hash: Digest,
 }

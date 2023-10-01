@@ -6,29 +6,29 @@ import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
-import vc_store from './vc_store/medicationRequest_vc.json';
+import vp_store from './vc_store/medicationRequest_vp.json';
 
-export function VcItems(): JSX.Element {
+export function VpItems(): JSX.Element {
   const theme = useMantineTheme();
   const navigate = useNavigate();
   // const medplum = useMedplum();
   // const patient = medplum.getProfile() as Patient;
   // const medications = medplum.searchResources('MedicationRequest', 'patient=' + getReferenceString(patient)).read();
-  const credentials = vc_store || [];
+  // import vc_store from './vc_store/medicationRequest_vc.json', if not found use empty array
+  const credentials = vp_store || [];
 
   return (
     <Box p="xl">
-      <Title mb="lg">Verifiable Credentials</Title>
-      <InfoSection title="Available VCs">
+      <Title mb="lg">Verifiable ZK Proof of Credentials</Title>
+      <InfoSection title="Available VPs">
         <Stack spacing={0}>
           {credentials.map((record) => (
             <InfoButton key={record.id} onClick={() => navigate(`./${record.id}`)}>
               <div>
                 <Text c={theme.fn.primaryColor()} fw={500} mb={4}>
-                  VC#: {record.id}
+                  VP#: {record.id}
                 </Text>
               </div>
-              {/* <StatusBadge status={resource.status as string} /> */}
               <IconChevronRight color={theme.colors.gray[5]} />
             </InfoButton>
           ))}
@@ -37,4 +37,3 @@ export function VcItems(): JSX.Element {
     </Box>
   );
 }
-

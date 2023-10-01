@@ -16,7 +16,7 @@ const signVc = async (issuerDidWithKeys: any, vc: any) => {
   return jwtService.signVC(issuerDidWithKeys, vc);
 };
 
-export const createVc = async (fhirResource: any) => {
+export const createVc = async (zkProof: any, fhirResourceType: string) => {
   const didKey = new KeyDIDMethod();
 
   const issuerDidWithKeys = await didKey.generateFromPrivateKey(privateKeyBufferFromString(ISSUER_EDDSA_PRIVATE_KEY));
@@ -26,10 +26,10 @@ export const createVc = async (fhirResource: any) => {
   const vcDidKey = (await didKey.create()).did;
 
   // const credentialType = "PROOF_OF_ADDRESS";
-  const credentialType = fhirResource.fhir.resourceType;
+  const credentialType = fhirResourceType;
 
   const subjectData = {
-    ...fhirResource,
+    ...zkProof,
   };
 
   //Setting an expiration data parameter for the VC

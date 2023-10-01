@@ -18,17 +18,16 @@ import {
 import { privateKeyBufferFromString } from "../utils/convertions";
 import { writeToFile } from "../utils/writer";
 
-export const createAndSignVp = async (vc: any) => {
-  const signedVcJwt = vc;
+export const createAndSignVp = async (signedVcJwt: any, zkProofOfFhirResource: any) => {
 
-  if (VC) {
+  if (signedVcJwt && zkProofOfFhirResource) {
     try {
-      console.log("\nReading an existing signed VC JWT\n");
+      // console.log("\nReading an existing signed VC JWT\n");
       // const signedVcJwt = fs.readFileSync(
       //   path.resolve(VC_DIR_PATH, `${camelCase(VC)}.jwt`),
       //   "utf8"
       // );
-      console.log(signedVcJwt);
+      // console.log(signedVcJwt);
 
       console.log("\nGeting User from VC\n");
       const holderDid = getSubjectFromVP(signedVcJwt);
@@ -99,3 +98,79 @@ export const createAndSignVp = async (vc: any) => {
 };
 
 // createAndSignVp();
+
+
+// {
+//   "exp": 1727756212,
+//   "vc": {
+//     "@context": [
+//       "https://www.w3.org/2018/credentials/v1"
+//     ],
+//     "type": [
+//       "VerifiableCredential",
+//       "MedicationRequest"
+//     ],
+//     "credentialSubject": {
+//       "fhir": {
+//         "id": "ee627f8d-7c5f-4b2a-9d9a-dbe25f516e5f",
+//         "meta": {
+//           "profile": [
+//             "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationrequest"
+//           ],
+//           "versionId": "648a89c3-4e09-4d07-ae0d-761019319bd9",
+//           "lastUpdated": "2023-09-25T01:55:15.760Z",
+//           "author": {
+//             "reference": "Practitioner/35735281-469a-4024-999e-b8dfeb6ce788",
+//             "display": "Chris Salvador"
+//           },
+//           "project": "ef3aae15-28ca-4585-a6fd-43382424181c",
+//           "compartment": [
+//             {
+//               "reference": "Project/ef3aae15-28ca-4585-a6fd-43382424181c"
+//             },
+//             {
+//               "reference": "Patient/2d5641ce-474e-4c66-896d-36a37de211eb"
+//             }
+//           ]
+//         },
+//         "status": "active",
+//         "intent": "order",
+//         "medicationCodeableConcept": {
+//           "coding": [
+//             {
+//               "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+//               "code": "313782",
+//               "display": "Acetaminophen 325 MG Oral Tablet"
+//             }
+//           ],
+//           "text": "Acetaminophen 325 MG Oral Tablet"
+//         },
+//         "subject": {
+//           "reference": "Patient/2d5641ce-474e-4c66-896d-36a37de211eb"
+//         },
+//         "encounter": {
+//           "reference": "Encounter/085d1cdd-c0c4-4427-a91a-812e1a5875e5"
+//         },
+//         "authoredOn": "2023-09-22T22:53:18.000Z",
+//         "requester": {
+//           "reference": "Practitioner/076541d6-51f5-4a37-88e7-1fd06c640223",
+//           "display": "Dr. Patricia625 Kilback373"
+//         },
+//         "reasonReference": [
+//           {
+//             "reference": "Condition/e9dce52e-329b-4478-b65d-af42d4d202f2"
+//           }
+//         ],
+//         "resourceType": "MedicationRequest"
+//       }
+//     },
+//     "credentialSchema": {
+//       "id": "http://json-schema.org/draft-06/schema#",
+//       "type": "JsonSchemaValidator2018"
+//     }
+//   },
+//   "sub": "did:key:z6MkumBwH3GvsrmMgsdLBd28B945zieEnvuoAcTG7PTrxCgb",
+//   "jti": "did:key:z6MkgDUL8tDF176WphbxJhRfA4oEZYx1FDdUBhjjeNr1qUxu",
+//   "nbf": 1696133815,
+//   "iss": "did:key:z6MktP8VMpTjshkdQfq3ZA4m9h1cTJ6KXLfeBXYntMBp7F21"
+// }

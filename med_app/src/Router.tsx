@@ -6,6 +6,8 @@ import { Provider } from './pages/account/Provider';
 import { VcMainPage } from './pages/vc';
 import { VcItem } from './pages/vc/VcItem';
 import { VcItems } from './pages/vc/VcItems';
+import { VpItem } from './pages/vc/VpItem';
+import { VpItems } from './pages/vc/VpItems';
 import { GetCare } from './pages/GetCarePage';
 import { HealthRecord } from './pages/health-record';
 import { LabResult } from './pages/health-record/LabResult';
@@ -43,6 +45,8 @@ export function Router(): JSX.Element {
         <Route index element={<Navigate replace to="/vc-main/vc-items" />} />
         <Route path="vc-items" element={<VcItems />} />
         <Route path="vc-items/:itemId" element={<VcItem />} />
+        <Route path="vp-items" element={<VpItems />} />
+        <Route path="vp-items/:itemId" element={<VpItem />} />
         <Route path="vc-items/login" element={<BiconomyLogin />} />
       </Route>
       <Route path="get-care/*" element={<GetCare />} />

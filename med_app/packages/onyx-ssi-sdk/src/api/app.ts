@@ -7,13 +7,13 @@ const app: Express = express();
 app.use(express.json());
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Origin', 'Content-Type', 'Authorization', 'Accept'],
-    credentials: true,
-    optionsSuccessStatus: 200,
-  };
-  
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Origin', 'Content-Type', 'Authorization', 'Accept'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
 app.use(cors(corsOptions));
 
 const port = 3001;
@@ -32,22 +32,68 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.post('/create-signed-vc', async (req: Request, res: Response, next: NextFunction) => {
-  const fhirResource = req.body;
+  const fhirHealthRecord = req.body;
 
-  
-  const vc = await createVc(fhirResource);
-  res.send({ message: vc });
+  console.log('fhirHealthRecord', fhirHealthRecord.fhir);
+
+  // Fetch zk proof from zkvm
+  try {
+    const url = `http://127.0.0.1:8080/zkp/create-medication-request`;
+    const method = 'POST';
+    const zkReceipt = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(fhirHealthRecord.fhir),
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const zkProof = await response.json();
+
+      console.log('zkProof', zkProof);
+
+      const signedVC = await createVc(zkProof, fhirHealthRecord.fhir.resourceType);
+      res.send({ message: signedVC });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 });
 
 app.post('/create-signed-vp', async (req: Request, res: Response, next: NextFunction) => {
-  const vc = req.body;
-  const signedVp = await createAndSignVp(vc);
+  const { issuerSignedVerifiableCredential, fhirHealthRecord } = req.body;
 
-  res.send({ message: signedVp });
+  // Fetch zk proof from zkvm
+  try {
+    const url = `http://127.0.0.1:8080/zkp/create-medication-request`;
+    const method = 'POST';
+    const zkReceipt = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(fhirHealthRecord),
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const zkProof = await response.json();
+
+      const signedVp = await createAndSignVp(zkProof, issuerSignedVerifiableCredential);
+      res.send({ message: signedVp });
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
 });
 
 export default app;
-
 
 // app.post('/create-signed-vc', async (req: Request, res: Response, next: NextFunction) => {
 //   const fhirResource = req.body;
