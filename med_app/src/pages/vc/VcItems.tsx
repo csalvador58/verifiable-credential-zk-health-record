@@ -1,40 +1,35 @@
 import { Box, Stack, Text, Title, useMantineTheme } from '@mantine/core';
-import { formatDate, getReferenceString } from '@medplum/core';
-import { Patient } from '@medplum/fhirtypes';
-import { StatusBadge, useMedplum } from '@medplum/react';
-import { IconCalendar } from '@tabler/icons-react';
+// import { getReferenceString } from '@medplum/core';
+// import { Patient } from '@medplum/fhirtypes';
+// import { useMedplum } from '@medplum/react';
+import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
-// import { vcs } from './vcs';
-import vcs from './vc_store/medicationRequest_vc.json';
+import vc_store from './vc_store/medicationRequest_vc.json';
 
 export function VcItems(): JSX.Element {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const medplum = useMedplum();
-  const patient = medplum.getProfile() as Patient;
-  // const carePlans = medplum.searchResources('CarePlan', 'subject=' + getReferenceString(patient)).read();
+  // const medplum = useMedplum();
+  // const patient = medplum.getProfile() as Patient;
+  // const medications = medplum.searchResources('MedicationRequest', 'patient=' + getReferenceString(patient)).read();
+
 
   return (
     <Box p="xl">
       <Title mb="lg">Verifiable Credentials</Title>
       <InfoSection title="Available VCs">
         <Stack spacing={0}>
-          {vcs.map((resource: any) => (
-            <InfoButton key={resource.id} onClick={() => navigate(`./${resource.id}`)}>
-            {/* <InfoButton key={resource.id} onClick={() => null}> */}
+          {vc_store.map((record) => (
+            <InfoButton key={record.id} onClick={() => navigate(`./${record.id}`)}>
               <div>
-                <Text c={theme.fn.primaryColor()} fw={500}>
-                  {resource.title}
+                <Text c={theme.fn.primaryColor()} fw={500} mb={4}>
+                  VC#: {record.id}
                 </Text>
-                {/* <Text mt="sm" c="gray.5" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <IconCalendar size={16} />
-                  <time>{formatDate(resource.period?.start)} </time>
-                  {resource.period?.end && <time>&nbsp;-&nbsp;{formatDate(resource.period.end)}</time>}
-                </Text> */}
               </div>
-              <StatusBadge status={resource.status as string} />
+              {/* <StatusBadge status={resource.status as string} /> */}
+              <IconChevronRight color={theme.colors.gray[5]} />
             </InfoButton>
           ))}
         </Stack>
@@ -42,3 +37,4 @@ export function VcItems(): JSX.Element {
     </Box>
   );
 }
+

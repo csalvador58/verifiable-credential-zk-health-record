@@ -9,8 +9,7 @@ import { camelCase } from 'lodash';
 import path from 'path';
 import { HOLDER_EDDSA_PRIVATE_KEY, ISSUER_EDDSA_PRIVATE_KEY, VC_SCHEMA_URL } from '../../config';
 import { privateKeyBufferFromString } from '../utils/convertions';
-import { writeToFile } from '../utils/writer';
-import { v4 as uuidv4 } from 'uuid';
+import fs from "fs";
 
 const jwtService = new JWTService();
 const signVc = async (issuerDidWithKeys: any, vc: any) => {
@@ -75,13 +74,40 @@ export const createVc = async (fhirResource: any) => {
 
     console.log('path: ', path.resolve('../../src/pages/vc_store/'));
 
-    writeToFile(
-      path.resolve(`../../src/pages/vc/store`, `${camelCase(credentialType)}_vc.json`),
-      JSON.stringify([{ id: uuidv4(), vc: signedVc }], null, 2)
+    writeToVCStore(
+      path.resolve(`../../src/pages/vc/vc_store`, `${camelCase(credentialType)}_vc.json`),
+      JSON.stringify({ id: vc.id, vc_signed: signedVc, vc_raw: vc }, null, 2)
     );
 
     return signedVc;
   } else {
     console.log('Schema Validation failed');
+  }
+};
+
+export const writeToVCStore = (fileLocationPath: string, content: string) => {
+  try {
+    // Read the existing JSON data from the file (if it exists)
+    let existingData = [];
+    if (fs.existsSync(fileLocationPath)) {
+      const fileContent = fs.readFileSync(fileLocationPath, "utf8");
+      existingData = JSON.parse(fileContent);
+    }
+
+    // Append the new data to the existing data array
+    const newData = JSON.parse(content);
+    existingData.push(newData);
+
+    // Write the updated data back to the file
+    fs.writeFileSync(fileLocationPath, JSON.stringify(existingData, null, 2));
+    
+    console.log(
+      `\nData appended to the file under ${path.dirname(
+        fileLocationPath
+      )} directory\n`
+    );
+  } catch (error) {
+    console.log("Failed to write file");
+    console.error(error);
   }
 };
