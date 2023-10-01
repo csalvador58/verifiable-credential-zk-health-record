@@ -24,12 +24,12 @@ mod resources;
 #[derive(Serialize, Deserialize, Debug)]
 struct ZKResponse {
     hash: String,
-    verifiable_data_1: String,
-    verifiable_data_2: String,
-    verifiable_data_3: String,
-    verifiable_data_4: String,
-    verifiable_data_5: String,
-    verifiable_data_6: String,
+    requester: String,
+    authoredOn: String,
+    status: String,
+    subject: String,
+    medicationCodeableConcept: String,
+    resourceType: String,
     image_id: [u32; 8],
 }
 
@@ -84,7 +84,7 @@ async fn main() -> std::io::Result<()> {
 //     let response = format!(
 //         "{{\"hash\": {:?}, \"verifiable_data\": {:?}}}",
 //         zkp_receipt.hash,
-//         String::from_utf8(zkp_receipt.verifiable_data_1).unwrap(),
+//         String::from_utf8(zkp_receipt.requester).unwrap(),
 //     );
 
 //     HttpResponse::Created()
@@ -169,18 +169,18 @@ async fn create_zkp_medical_request(
 
     let response: ZKResponse = ZKResponse {
         hash: format!("{:?}", output.hash),
-        verifiable_data_1: String::from_utf8(output.verifiable_data_1.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_1"),
-        verifiable_data_2: String::from_utf8(output.verifiable_data_2.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_2"),
-        verifiable_data_3: String::from_utf8(output.verifiable_data_3.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_3"),
-        verifiable_data_4: String::from_utf8(output.verifiable_data_4.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_4"),
-        verifiable_data_5: String::from_utf8(output.verifiable_data_5.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_5"),
-        verifiable_data_6: String::from_utf8(output.verifiable_data_6.clone())
-            .expect("Invalid UTF-8 sequence in verifiable_data_6"),
+        requester: String::from_utf8(output.requester.clone())
+            .expect("Invalid UTF-8 sequence in requester"),
+        authoredOn: String::from_utf8(output.authoredOn.clone())
+            .expect("Invalid UTF-8 sequence in authoredOn"),
+        status: String::from_utf8(output.status.clone())
+            .expect("Invalid UTF-8 sequence in status"),
+        subject: String::from_utf8(output.subject.clone())
+            .expect("Invalid UTF-8 sequence in subject"),
+        medicationCodeableConcept: String::from_utf8(output.medicationCodeableConcept.clone())
+            .expect("Invalid UTF-8 sequence in medicationCodeableConcept"),
+        resourceType: String::from_utf8(output.resourceType.clone())
+            .expect("Invalid UTF-8 sequence in resourceType"),
         image_id: VALIDATE_ID,
     };
 

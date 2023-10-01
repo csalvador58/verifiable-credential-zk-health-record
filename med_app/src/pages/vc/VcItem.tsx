@@ -17,13 +17,23 @@ export function VcItem(): JSX.Element {
   // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
 
   const resource = vcs.find((vc: any) => vc.id === itemId)!;
+
+  const test = resource.vc_raw.credentialSubject.medicationCodeableConcept;
+  console.log('test');
+  console.log(test);
+
+  const test5 = JSON.parse(test);
+  console.log('test5');
+  console.log(test5);
+
+
   const handleVPRequest = async () => {
     setSignedVC(['', false]);
 
-    console.log(resource.vc_raw.credentialSubject.fhir);
+    console.log(resource.vc_raw.credentialSubject);
 
     try {
-      const fhirHealthRecord = { ...resource.vc_raw.credentialSubject.fhir };
+      const fhirHealthRecord = { ...resource.vc_raw.credentialSubject };
       const issuerSignedVerifiableCredential = resource.vc_signed;
       const url = `${ONYX_API}/create-signed-vp`;
       const method = 'POST';
@@ -66,17 +76,14 @@ export function VcItem(): JSX.Element {
           <Button onClick={async () => await handleVPRequest()}>
             Click here to claim a proof of your Verifiable Credential
           </Button>
-          <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.fhir.resourceType} />
-          <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.fhir.authoredOn} />
+          <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
+          <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
           <Divider />
-          <KeyValue
-            name="Medication Request"
-            value={resource.vc_raw.credentialSubject.fhir.medicationCodeableConcept.text}
-          />
+          <KeyValue name="Medication Request" value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text} />
           <Divider />
           <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
           <Divider />
-          <StatusBadge status={resource.vc_raw.credentialSubject.fhir.status as string} />
+          <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
         </Stack>
       </InfoSection>
     </Box>

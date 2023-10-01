@@ -37,12 +37,12 @@ pub fn main() {
     let value_6: Vec<u8> = verifiable_credential[field_to_validate_6].to_string().as_bytes().to_vec();
     
     let output = Outputs {
-        verifiable_data_1: value_1,
-        verifiable_data_2: value_2,
-        verifiable_data_3: value_3,
-        verifiable_data_4: value_4,
-        verifiable_data_5: value_5,
-        verifiable_data_6: value_6,
+        requester: value_1,
+        authoredOn: value_2,
+        status: value_3,
+        subject: value_4,
+        medicationCodeableConcept: value_5,
+        resourceType: value_6,
         hash: sha_verifiable_credential,
     };
     

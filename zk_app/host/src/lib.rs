@@ -26,27 +26,27 @@ pub fn zkvm_host(verifiable_credential: &str) -> Receipt {
     println!("Hash: {:?}\n", output.hash);
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_1.clone()).unwrap()
+        String::from_utf8(output.requester.clone()).unwrap()
     );
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_2.clone()).unwrap()
+        String::from_utf8(output.authoredOn.clone()).unwrap()
     );
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_3.clone()).unwrap()
+        String::from_utf8(output.status.clone()).unwrap()
     );
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_4.clone()).unwrap()
+        String::from_utf8(output.subject.clone()).unwrap()
     );
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_5.clone()).unwrap()
+        String::from_utf8(output.medicationCodeableConcept.clone()).unwrap()
     );
     println!(
         "Data {:?}",
-        String::from_utf8(output.verifiable_data_6.clone()).unwrap()
+        String::from_utf8(output.resourceType.clone()).unwrap()
     );
 
     // Return receipt
