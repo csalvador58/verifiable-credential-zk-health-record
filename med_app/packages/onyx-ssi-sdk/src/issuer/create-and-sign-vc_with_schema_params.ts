@@ -72,6 +72,8 @@ export const createVc = async (fhirResource: any) => {
     const signedVc = await signVc(issuerDidWithKeys, vc);
     console.log(signedVc);
 
+    console.log("VC Path", VC_DIR_PATH);
+
     writeToVCStore(
       path.resolve(VC_DIR_PATH, `${camelCase(credentialType)}_vc.json`),
       JSON.stringify({ id: vc.id, vc_signed: signedVc, vc_raw: vc }, null, 2)
