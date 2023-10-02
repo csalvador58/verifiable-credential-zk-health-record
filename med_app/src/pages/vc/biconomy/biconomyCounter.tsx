@@ -5,7 +5,7 @@ import {
   SponsorUserOperationDto,
   PaymasterMode,
 } from '@biconomy/paymaster';
-import abi from '../utils/counterAbi.json';
+import abi from '../../../utils/counterAbi.json';
 import { ethers } from 'ethers';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

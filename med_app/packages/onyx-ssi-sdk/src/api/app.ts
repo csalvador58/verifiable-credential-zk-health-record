@@ -19,7 +19,7 @@ app.use(cors(corsOptions));
 const port = 3001;
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
 
 app.use((req: Request, res: Response, next: NextFunction) => {

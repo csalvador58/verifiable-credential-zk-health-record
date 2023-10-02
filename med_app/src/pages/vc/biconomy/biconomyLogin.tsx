@@ -1,4 +1,5 @@
 import '@biconomy/web3-auth/dist/src/style.css';
+import Web3 from 'web3';
 import { useState, useEffect, useRef } from 'react';
 import SocialLogin from '@biconomy/web3-auth';
 import { Wallet, providers, ethers } from 'ethers';
@@ -10,6 +11,7 @@ import { IPaymaster, BiconomyPaymaster } from '@biconomy/paymaster';
 import { ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from '@biconomy/modules';
 import Counter from './biconomyCounter';
 import styles from '@/styles/Home.module.css';
+import { recoverPersonalSignature } from '@metamask/eth-sig-util';
 // import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
 const bundler: IBundler = new Bundler({
@@ -86,6 +88,9 @@ export function BiconomyLogin() {
         signer: web3Provider.getSigner(),
         moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
       });
+
+      console.log('web3Provider.getSigner()')
+      console.log(web3Provider.getSigner())
   
       console.log('module: ', module);
       let biconomySmartAccount = await BiconomySmartAccountV2.create({
@@ -123,6 +128,46 @@ export function BiconomyLogin() {
 
   };
 
+  const signMessage = async () => {
+    if (await magic?.user.isLoggedIn()) {
+      // let info = await magic?.user.getIdToken();
+      // console.log('info: ', info);
+
+      const web3 = new Web3(magic.rpcProvider as any);
+      const publicAddress = (await magic?.user.getMetadata()).publicAddress!;
+
+      console.log('publicAddress: ', publicAddress);
+
+      const signedMessage = await web3?.eth.personal.sign(
+        "Hello from Biconomy!",
+        publicAddress,
+        ""
+      );
+
+      console.log('signedMessage: ', signedMessage);
+       // // recover the public address of the signer to verify
+      // const recoveredAddress = web3?.eth.accounts.recover({
+      //   data: 'Here is a basic message',
+      //   signature: signedMessage,
+      // });
+      // recover the public address of the signer to verify
+      const strToBufferInputType = new TextEncoder().encode("Hello from Biconomy!");
+      // convert a string to a uint8array
+      
+      const recoveredAddress = recoverPersonalSignature({
+        data: strToBufferInputType,
+        signature: signedMessage!,
+      });
+      console.log(
+        recoveredAddress?.toLocaleLowerCase() ===
+        publicAddress?.toLocaleLowerCase()
+          ? 'Signing success!'
+          : 'Signing failed!'
+      );
+    }
+
+  };
+
   return (
     <div>
       <h1> Biconomy Smart Accounts using Magic login + Gasless Transactions</h1>
@@ -136,6 +181,7 @@ export function BiconomyLogin() {
           <Counter smartAccount={smartAccount} provider={provider} />
           <button onClick={logout}>Logout</button>
           <button onClick={getInfo}>Get Info</button>
+          <button onClick={signMessage}>Sign Message</button>
         </div>
       )}
       <p>

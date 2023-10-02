@@ -3,7 +3,7 @@ import { formatDateTime, formatHumanName, formatTiming } from '@medplum/core';
 import { HumanName, MedicationRequest } from '@medplum/fhirtypes';
 import { ResourceTable, useMedplum } from '@medplum/react';
 import { useCallback, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import { ONYX_API } from '../../config';
 import { ToastContainer, toast } from 'react-toastify';
@@ -96,22 +96,21 @@ function VcModal({
     }
   };
 
+  const email = patient?.telecom?.find((t) => t.system === 'email')?.value;
+
   return (
     <Modal
       size="lg"
       opened={opened}
       onClose={() => setOpened(false)}
-      title={<span style={{ fontSize: '24px', fontWeight: 'bold' }}>Request a Renewal</span>}
+      title={<span style={{ fontSize: '24px', fontWeight: 'bold' }}>Verifiable Credential Request</span>}
     >
       <Stack spacing="md">
         <KeyValue name="Patient" value={formatHumanName(patient?.name?.[0] as HumanName)} />
         <KeyValue name="Last Prescribed" value={formatDateTime(prev.authoredOn)} />
         <KeyValue name="Status" value={prev.status} />
         <KeyValue name="Medication" value={prev.medicationCodeableConcept?.text} />
-        <KeyValue
-          name="Dosage Instructions"
-          value={prev.dosageInstruction?.[0]?.timing && formatTiming(prev.dosageInstruction[0].timing)}
-        />
+        <Instructions name="Instructions" value={email} />
         {!!signedVC && <Button onClick={async () => await handleVCRequest()}>Submit VC Request</Button>}
       </Stack>
       <ToastContainer />
@@ -128,6 +127,27 @@ function KeyValue({ name, value }: { name: string; value: string | undefined }):
       <Text size="lg" weight={500}>
         {value}
       </Text>
+    </div>
+  );
+}
+
+function Instructions({ name, value }: { name: string; value: string | undefined }): JSX.Element {
+  return (
+    <div>
+      <Text size="xs" color="gray" tt="uppercase">
+        {name}
+      </Text>
+      <div>
+        Click the submit button to request a Verifiable Credential for this medical record. Your Health Provider will
+        issue a signed credential containing a digital version of this record. After a few moments, visit the{' '}
+        <Link to="/vc-main" style={{ textDecoration: 'none' }}>
+          <span style={{ fontWeight: 'bold', color: 'blue' }}> Verifiable Credential</span>
+        </Link>{' '}
+        section of this site to view the proof of your credential. At any time, you can claim this verifiable proof into
+        your smart account that is associated with your email{' '}
+        <span style={{ fontWeight: 'bold', color: 'blue' }}>{value}</span>. Present this proof of your verifiable
+        credentials to a verifier to process your healthcare request.
+      </div>
     </div>
   );
 }
