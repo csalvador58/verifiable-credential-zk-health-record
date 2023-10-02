@@ -1,15 +1,18 @@
-import { useMantineTheme } from '@mantine/core';
+import { Box, useMantineTheme } from '@mantine/core';
 import logo from '../img/logo/Health Management System.svg';
 
 export interface LogoProps {
   width: number;
+  height: number;
+  leftMargin: number;
 }
 
 export function Logo(props: LogoProps): JSX.Element {
   const theme = useMantineTheme();
   const color = theme.fn.primaryColor();
-  const width = 350;
-  const height = 55;
+  const width = props.width;
+  const height = props.height;
+  const leftMargin=props.leftMargin;
   return (
     // <svg
     //   width="1050"
@@ -65,6 +68,8 @@ export function Logo(props: LogoProps): JSX.Element {
     //     fill="white"
     //   />
     // </svg>
-    <img src={logo} alt="logo" style={{ width, height, color }}/>
+    <Box display={"flex"} ml={leftMargin}>
+      <img src={logo} alt="logo" style={{ width, height, color }} />
+    </Box>
   );
 }

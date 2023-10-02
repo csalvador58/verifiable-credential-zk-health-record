@@ -204,7 +204,7 @@ export function LandingPage(): JSX.Element {
               The future of healthcare is now
             </Text>
             <Text size={20} c={theme.colors.gray[7]}>
-              Built with Onyx by J.P. Morgan, Biconomy, and Medplum. Your health is your data.
+              Built with Onyx by J.P. Morgan, Biconomy, and Magic on the Medplum platform. Your health is your data.
             </Text>
           </div>
           <img className={classes.heroImage3} src='https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2970&q=80' alt="Woman staring into sunlight in the woods" />

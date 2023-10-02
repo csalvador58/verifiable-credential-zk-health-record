@@ -177,7 +177,8 @@ export function Header(): JSX.Element {
           <Group position="apart">
             <UnstyledButton className={classes.logoButton} onClick={() => navigate('/')}>
               {/* <Logo width={240} />  */}
-              <Title className={classes.title}>Health Management System</Title>
+              <Logo width={500} height={50} leftMargin={-115}/>
+              {/* <Title className={classes.title}>Health Management System</Title> */}
             </UnstyledButton>
 
             <Group sx={{ height: '100%' }} spacing={0} className={classes.hiddenMobile}>

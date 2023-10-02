@@ -107,7 +107,7 @@ export function Header(): JSX.Element {
       <Container>
         <div className={classes.inner}>
           <UnstyledButton className={classes.logoButton} onClick={() => navigate('/')}>
-            <Logo width={240} />
+            <Logo width={240} height={50} leftMargin={0} />
           </UnstyledButton>
           <Group spacing={5} className={classes.links}>
             {navigation.map((link) => (
