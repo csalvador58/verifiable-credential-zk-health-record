@@ -3,11 +3,11 @@ import { AccountPage } from './pages/account';
 import { MembershipAndBilling } from './pages/account/MembershipAndBilling';
 import { Profile } from './pages/account/Profile';
 import { Provider } from './pages/account/Provider';
-import { VcMainPage } from './pages/vc';
-import { VcItem } from './pages/vc/VcItem';
-import { VcItems } from './pages/vc/VcItems';
-import { VpItem } from './pages/vc/VpItem';
-import { VpItems } from './pages/vc/VpItems';
+import { VcMainPage } from './pages/verifiable-credentials';
+import { VcItem } from './pages/verifiable-credentials/VcItem';
+import { VcItems } from './pages/verifiable-credentials/VcItems';
+import { VpItem } from './pages/verifiable-credentials/VpItem';
+import { VpItems } from './pages/verifiable-credentials/VpItems';
 import { GetCare } from './pages/GetCarePage';
 import { HealthRecord } from './pages/health-record';
 import { LabResult } from './pages/health-record/LabResult';
@@ -22,7 +22,7 @@ import { HomePage } from './pages/HomePage';
 import { Messages } from './pages/MessagesPage';
 import { ObservationPage } from './pages/ObservationPage';
 import { SignOutPage } from './pages/SignOutPage';
-import { BiconomyLogin } from './pages/vc/biconomy/biconomyLogin';
+import { BiconomyLogin } from './pages/verifiable-credentials/biconomy/biconomyLogin';
 
 export function Router(): JSX.Element {
   return (
@@ -42,7 +42,7 @@ export function Router(): JSX.Element {
       </Route>
       <Route path="Observation/:observationId" element={<ObservationPage />} />
       <Route path="vc-main/*" element={<VcMainPage />}>
-        <Route index element={<Navigate replace to="/vc-main/login" />} />
+        <Route index element={<Navigate replace to="/vc-main/vc-items" />} />
         <Route path="vc-items/login" element={<BiconomyLogin />} />
         <Route path="vc-items" element={<VcItems />} />
         <Route path="vc-items/:itemId" element={<VcItem />} />

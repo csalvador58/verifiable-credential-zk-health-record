@@ -31,8 +31,12 @@ export function Medication(): JSX.Element {
       <VcModal prev={med} opened={modalOpen} setOpened={setModalOpen} signedVC={signedVC} setSignedVC={setSignedVC} />
       {signedVC[1] && (
         <>
-          <div>Signed Verifiable Credential</div>
-          <div>{signedVC[0]}</div>
+          <Link to="/vc-main" style={{ textDecoration: 'none' }}>
+            <span style={{ fontWeight: 'bold', color: 'blue', marginLeft: '1rem' }}>
+              {' '}
+              Click here to go the Verifiable Credentials section to view your issued credentials
+            </span>
+          </Link>{' '}
         </>
       )}
     </Box>

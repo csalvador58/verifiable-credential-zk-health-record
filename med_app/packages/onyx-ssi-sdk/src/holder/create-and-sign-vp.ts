@@ -67,7 +67,7 @@ export const createAndSignVp = async (signedVCJwt: string) => {
           const {id, type} = getVerifiableCredentialID(signedVCJwt);
           writeToVCStore(
             path.resolve(VP_DIR_PATH, `${camelCase(type)}_vp.json`),
-            JSON.stringify({ id, vp_signed: signedVp }, null, 2)
+            JSON.stringify({ id, vp_signed: signedVp, date_signed: new Date().toLocaleString()}, null, 2)
           );
         } else {
           console.log('\nHOLDER_EDDSA_PRIVATE_KEY cannot sign for this verifiable credentail\n');

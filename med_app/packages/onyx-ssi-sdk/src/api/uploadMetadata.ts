@@ -19,7 +19,7 @@ export const uploadMetadata = async ({DIDkey, description, external_url, imageCI
         image: `ipfs://${imageCID}`,
       },
       pinataMetadata: {
-        name: `Issued on ${new Date().toLocaleString()}`,
+        name: `HMS credential: ${DIDkey} - Issued on ${new Date().toLocaleString()}`,
       },
     });
 

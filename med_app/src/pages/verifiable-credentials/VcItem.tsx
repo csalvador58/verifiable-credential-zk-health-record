@@ -1,28 +1,32 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
-import { ResourceTable, StatusBadge, useMedplum } from '@medplum/react';
+import { StatusBadge } from '@medplum/react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import verifiableCredentials from './vc_store/medicationRequest_vc.json';
 import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { ToastContainer, toast } from 'react-toastify';
 import { ONYX_API } from '../../config';
-import { useState } from 'react';
+import { IIssuedVerifiableCredential } from './types/verifiableCredential';
+import { IVerifiablePresentation } from './types/verifiablePresentation';
 
 export function VcItem(): JSX.Element {
   const theme = useMantineTheme();
   const { itemId } = useParams();
 
-  const resource = verifiableCredentials.find((vc: any) => vc.id === itemId)!;
+  const credentials = verifiableCredentials as IIssuedVerifiableCredential[];
+  const resource = credentials.find((vc) => vc.id === itemId);
 
   // check if itemId has already been signed
-  const status = verifiablePresentations.some((vp) => vp.id === itemId);
+  const status = verifiablePresentations.some((vp: IVerifiablePresentation) => vp.id === itemId);
 
+  // On fetch completion, an issuer signed vc with zkp will be saved in 
+  //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json simulating the Issuers DB
   const handleVCRequest = async () => {
     console.log(resource);
 
     try {
-      const signedVCJwt = resource.vc_signed;
-      console.log(signedVCJwt);
+      const signedVCJwt = resource?.vc_signed;
+      
       const url = `${ONYX_API}/create-signed-vp`;
       const method = 'POST';
 
@@ -66,25 +70,33 @@ export function VcItem(): JSX.Element {
   return (
     <Box p="xl">
       <Title mb="lg">Credential Details</Title>
-      <InfoSection title={'ID: ' + resource.id}>
-        <Stack spacing={0}>
-          {!status && <Button onClick={async () => await handleVCRequest()}>Click to sign your issued Verifiable Credential</Button>}
-          <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
-          <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
-          <Divider />
-          <KeyValue
-            name="Medication Request"
-            value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text}
-          />
-          <Divider />
-          <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
-          <Divider />
-          <KeyValue name="Signed Status" value={status ? "Completed" : "Not Signed"} />
-          <Divider />
-          <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
-          <ToastContainer />
-        </Stack>
-      </InfoSection>
+      {!!resource ? (
+        <InfoSection title={'ID: ' + resource.id}>
+          <Stack spacing={0}>
+            {!status && (
+              <Button onClick={async () => await handleVCRequest()}>
+                Click to sign your issued Verifiable Credential
+              </Button>
+            )}
+            <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
+            <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
+            <Divider />
+            <KeyValue
+              name="Medication Request"
+              value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text}
+            />
+            <Divider />
+            <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
+            <Divider />
+            <KeyValue name="Signed Status" value={status ? 'Completed' : 'Not Signed'} />
+            <Divider />
+            <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
+            <ToastContainer />
+          </Stack>
+        </InfoSection>
+      ) : (
+        <Text>No Verifiable Credentials found.</Text>
+      )}
     </Box>
   );
 }

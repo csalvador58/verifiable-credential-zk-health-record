@@ -1,38 +1,39 @@
 import { Box, Stack, Text, Title, useMantineTheme } from '@mantine/core';
-// import { getReferenceString } from '@medplum/core';
-// import { Patient } from '@medplum/fhirtypes';
-// import { useMedplum } from '@medplum/react';
 import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
 import verifiableCredentials from './vc_store/medicationRequest_vc.json';
+import verifiablePresentations from './vc_store/medicationRequest_vp.json';
+import { StatusBadge } from '@medplum/react';
+import { IIssuedVerifiableCredential } from './types/verifiableCredential';
 
 export function VcItems(): JSX.Element {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  // const medplum = useMedplum();
-  // const patient = medplum.getProfile() as Patient;
-  // const medications = medplum.searchResources('MedicationRequest', 'patient=' + getReferenceString(patient)).read();
-  const credentials = verifiableCredentials || [];
+
+  const credentials = verifiableCredentials as IIssuedVerifiableCredential[];
 
   return (
     <Box p="xl">
       <Title mb="lg">Verifiable Credentials</Title>
       <InfoSection title="Available VCs">
-        <Stack spacing={0}>
-          {credentials.map((record) => (
+        {!!credentials.length ?
+        (<Stack spacing={0}>
+          {!!credentials.length && credentials.map((record: IIssuedVerifiableCredential) => (
             <InfoButton key={record.id} onClick={() => navigate(`./${record.id}`)}>
               <div>
                 <Text c={theme.fn.primaryColor()} fw={500} mb={4}>
                   VC#: {record.id}
                 </Text>
               </div>
-              {/* <StatusBadge status={resource.status as string} /> */}
+              <StatusBadge status={verifiablePresentations.some((vp) => vp.id === record.id) ? "Signed" : "Not Signed"} />
               <IconChevronRight color={theme.colors.gray[5]} />
             </InfoButton>
           ))}
-        </Stack>
+        </Stack>) : (
+          <Text>No Verifiable Credentials have been issued.</Text>
+        )}
       </InfoSection>
     </Box>
   );

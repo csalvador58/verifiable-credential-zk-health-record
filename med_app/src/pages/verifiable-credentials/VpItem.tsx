@@ -8,16 +8,13 @@ import { ToastContainer, toast } from 'react-toastify';
 export function VpItem(): JSX.Element {
   const theme = useMantineTheme();
   const { itemId } = useParams();
-  // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
 
   const resource = verfiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
 
+    // On fetch completion, the holder's signed verifiable presentation will be saved in 
+  //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json simulating the Issuers DB
   const handleVPRequest = async () => {
-    console.log(resource);
-
     try {
-      // const signedVCJwt = resource.vc_signed;
-      // console.log(signedVCJwt);
       const url = `${ONYX_API}/generate-cid`;
       const method = 'POST';
 
@@ -69,6 +66,8 @@ export function VpItem(): JSX.Element {
           <Button onClick={async () => await handleVPRequest()}>
             Click here to claim a proof of your Verifiable Credential
           </Button>
+          <Divider />
+          <KeyValue name="Date Issued " value={resource.date_signed as string} />
           <Divider />
           <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
           <Divider />
