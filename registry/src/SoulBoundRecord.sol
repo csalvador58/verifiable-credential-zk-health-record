@@ -3,21 +3,20 @@ pragma solidity ^0.8.9;
 
 import "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "openzeppelin-contracts/contracts/access/Ownable.sol";
-import "openzeppelin-contracts/contracts/utils/Counters.sol";
 
-contract SoulboundMedicalRecord is ERC721, ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
-
-    Counters.Counter private _tokenIdCounter;
+contract SoulboundRecord is ERC721, ERC721URIStorage, ERC721Burnable, Ownable {
+   
     event NewRecord(address indexed owner, uint256 indexed tokenId);
     event RecordDeleted(address indexed owner, uint256 indexed tokenId);
 
-    constructor() ERC721("SoulboundMedicalRecord", "HMS") {}
+    constructor() ERC721("SoulboundRecord", "HMS") {}
 
-    function safeMint(address to, string memory uri) public onlyOwner {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
+    function safeMint(address to, uint256 tokenId, string memory uri)
+        public
+        onlyOwner
+    {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
     }
@@ -27,7 +26,7 @@ contract SoulboundMedicalRecord is ERC721, ERC721URIStorage, Ownable {
         address to
         // uint256 tokenId
     ) internal virtual {
-        require(from == address(0) || to == address(0), "SoulboundMedicalRecord: token is non-transferrable");
+        require(from == address(0) || to == address(0), "SoulboundRecord: token is non-transferrable");
     }
 
     function _afterTokenTransfer(
@@ -42,8 +41,8 @@ contract SoulboundMedicalRecord is ERC721, ERC721URIStorage, Ownable {
         }
     } 
 
-    function burn(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "SoulboundMedicalRecord: caller is not owner of token");
+    function burn(uint256 tokenId) public override {
+        require(ownerOf(tokenId) == msg.sender, "SoulboundRecord: caller is not owner of token");
         _burn(tokenId);
     }
 
@@ -53,7 +52,7 @@ contract SoulboundMedicalRecord is ERC721, ERC721URIStorage, Ownable {
 
      
 
-    // The following functions are overrides required by Solidity.
+   // The following functions are overrides required by Solidity.
 
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
