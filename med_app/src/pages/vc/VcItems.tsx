@@ -6,7 +6,7 @@ import { IconChevronRight } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { InfoButton } from '../../components/InfoButton';
 import { InfoSection } from '../../components/InfoSection';
-import vc_store from './vc_store/medicationRequest_vc.json';
+import verifiableCredentials from './vc_store/medicationRequest_vc.json';
 
 export function VcItems(): JSX.Element {
   const theme = useMantineTheme();
@@ -14,7 +14,7 @@ export function VcItems(): JSX.Element {
   // const medplum = useMedplum();
   // const patient = medplum.getProfile() as Patient;
   // const medications = medplum.searchResources('MedicationRequest', 'patient=' + getReferenceString(patient)).read();
-  const credentials = vc_store || [];
+  const credentials = verifiableCredentials || [];
 
   return (
     <Box p="xl">

@@ -1,27 +1,78 @@
-import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group } from '@mantine/core';
-import { CarePlan } from '@medplum/fhirtypes';
-import { ResourceTable, StatusBadge, useMedplum } from '@medplum/react';
+import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import vcs from './vc_store/medicationRequest_vc.json';
-import vp from './vc_store/medicationRequest_vp.json';
+import verfiablePresentation from './vc_store/medicationRequest_vp.json';
+import { ONYX_API } from '../../config';
+import { ToastContainer, toast } from 'react-toastify';
 
 export function VpItem(): JSX.Element {
   const theme = useMantineTheme();
   const { itemId } = useParams();
   // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
 
-  const resource = vp.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
+  const resource = verfiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
+
+  const handleVPRequest = async () => {
+    console.log(resource);
+
+    try {
+      // const signedVCJwt = resource.vc_signed;
+      // console.log(signedVCJwt);
+      const url = `${ONYX_API}/generate-cid`;
+      const method = 'POST';
+
+      const data = await toast
+        .promise(
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ did: resource.id }),
+          }),
+          {
+            pending: 'Requesting VP...',
+            success: 'VP Requested!',
+            error: 'Error requesting VP.',
+          },
+          {
+            position: 'top-center',
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          }
+        )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          setTimeout(() => {
+            console.log('response.json()');
+            console.log(response.json());
+          }, 1000);
+          // return response.json();
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Box p="xl">
       <Title mb="lg">Verifiable Proof Details</Title>
-      <InfoSection title={"ID: " + resource.id}>
+      <InfoSection title={'ID: ' + resource.id}>
         <Stack spacing={0}>
-          {/* <KeyValue name="Signed VC" value={resource.id} /> */}
+          <Button onClick={async () => await handleVPRequest()}>
+            Click here to claim a proof of your Verifiable Credential
+          </Button>
           <Divider />
           <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
           <Divider />
+          <ToastContainer />
         </Stack>
       </InfoSection>
     </Box>
@@ -46,12 +97,12 @@ interface AccordionProps {
   VerifiableCredential: string;
 }
 
-function AccordionDisplay({DID_VC, VerifiableCredential}: AccordionProps): JSX.Element {
+function AccordionDisplay({ DID_VC, VerifiableCredential }: AccordionProps): JSX.Element {
   return (
     <Accordion defaultValue="Signed Verifiable Credential">
       <Accordion.Item value={DID_VC}>
-        <Accordion.Control >
-            <AccordionLabel DID_VC={DID_VC} VerifiableCredential={""} />
+        <Accordion.Control>
+          <AccordionLabel DID_VC={DID_VC} VerifiableCredential={''} />
         </Accordion.Control>
         <Accordion.Panel>{VerifiableCredential}</Accordion.Panel>
       </Accordion.Item>
@@ -59,9 +110,7 @@ function AccordionDisplay({DID_VC, VerifiableCredential}: AccordionProps): JSX.E
   );
 }
 
-
-
-function AccordionLabel({DID_VC}: AccordionProps): JSX.Element {
+function AccordionLabel({ DID_VC }: AccordionProps): JSX.Element {
   return (
     <Group>
       <div>

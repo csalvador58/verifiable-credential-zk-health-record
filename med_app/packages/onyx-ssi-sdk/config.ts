@@ -64,3 +64,6 @@ export interface JwtPayload {
   iat?: number | undefined;
   jti?: string | undefined;
 }
+
+// For Pinata API
+export const PINATA_API_KEY = getParam("PINATA_API_KEY");

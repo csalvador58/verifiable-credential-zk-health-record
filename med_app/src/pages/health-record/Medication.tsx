@@ -79,7 +79,16 @@ function VcModal({
             success: 'VC Requested!',
             error: 'Error requesting VC.',
           },
-          { autoClose: false }
+          {
+            position: 'top-center',
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          }
         )
         .then((response) => {
           if (!response.ok) {

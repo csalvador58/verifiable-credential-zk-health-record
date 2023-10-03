@@ -1,26 +1,23 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
-import { CarePlan } from '@medplum/fhirtypes';
 import { ResourceTable, StatusBadge, useMedplum } from '@medplum/react';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import vcs from './vc_store/medicationRequest_vc.json';
-import { useState } from 'react';
+import verifiableCredentials from './vc_store/medicationRequest_vc.json';
+import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { ToastContainer, toast } from 'react-toastify';
 import { ONYX_API } from '../../config';
-
-type SignedVC = [string, boolean];
+import { useState } from 'react';
 
 export function VcItem(): JSX.Element {
   const theme = useMantineTheme();
   const { itemId } = useParams();
-  const [signedVC, setSignedVC] = useState<SignedVC>(['', false]);
-  // const resource: CarePlan = medplum.readResource('CarePlan', itemId as string).read();
 
-  const resource = vcs.find((vc: any) => vc.id === itemId)!;
+  const resource = verifiableCredentials.find((vc: any) => vc.id === itemId)!;
 
-  const handleVPRequest = async () => {
-    setSignedVC(['', false]);
+  // check if itemId has already been signed
+  const status = verifiablePresentations.some((vp) => vp.id === itemId);
 
+  const handleVCRequest = async () => {
     console.log(resource);
 
     try {
@@ -43,15 +40,22 @@ export function VcItem(): JSX.Element {
             success: 'VC Requested!',
             error: 'Error requesting VC.',
           },
-          { autoClose: false }
+          {
+            position: 'top-center',
+            autoClose: 2500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          }
         )
         .then((response) => {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          setTimeout(() => {
-            setSignedVC([data.message, true]);
-          }, 1000);
+          setTimeout(() => {}, 1000);
           return response.json();
         });
     } catch (error) {
@@ -64,9 +68,7 @@ export function VcItem(): JSX.Element {
       <Title mb="lg">Credential Details</Title>
       <InfoSection title={'ID: ' + resource.id}>
         <Stack spacing={0}>
-          <Button onClick={async () => await handleVPRequest()}>
-            Click here to claim a proof of your Verifiable Credential
-          </Button>
+          {!status && <Button onClick={async () => await handleVCRequest()}>Click to sign your issued Verifiable Credential</Button>}
           <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
           <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
           <Divider />
@@ -77,7 +79,10 @@ export function VcItem(): JSX.Element {
           <Divider />
           <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
           <Divider />
+          <KeyValue name="Signed Status" value={status ? "Completed" : "Not Signed"} />
+          <Divider />
           <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
+          <ToastContainer />
         </Stack>
       </InfoSection>
     </Box>
