@@ -1,6 +1,4 @@
-import {
-    PINATA_API_KEY,
-  } from '../../config';
+import { PINATA_API_KEY } from '../../config';
 
 export interface Metadata {
   DIDkey: string;
@@ -9,32 +7,36 @@ export interface Metadata {
   imageCID: string;
 }
 
-export const uploadMetadata = async ({DIDkey, description, external_url, imageCID}: Metadata) => {
+export const uploadMetadata = async ({ DIDkey, description, external_url, imageCID }: Metadata) => {
   try {
     const data = JSON.stringify({
       pinataContent: {
-        DIDkey: `${DIDkey}`,
-        description: `${description}`,
-        external_url: `${external_url}`,
-        image: `ipfs://${imageCID}`,
+        DIDkey: DIDkey,
+        description: description,
+        external_url: external_url,
+        image: imageCID,
       },
       pinataMetadata: {
-        name: `HMS credential: ${DIDkey} - Issued on ${new Date().toLocaleString()}`,
+        keyvalues: {
+          did: DIDkey,
+          date: new Date().toLocaleString(),
+        },
+        name: `HMS credential`,
       },
     });
 
-    const res = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+    const res = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${PINATA_API_KEY}`
+        Authorization: `Bearer ${PINATA_API_KEY}`,
       },
-      body: data
-    })
-    const resData = await res.json()
-    console.log("Metadata uploaded, CID:", resData.IpfsHash)
-    return resData.IpfsHash
+      body: data,
+    });
+    const resData = await res.json();
+    console.log('Metadata uploaded, CID:', resData.IpfsHash);
+    return resData.IpfsHash;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
