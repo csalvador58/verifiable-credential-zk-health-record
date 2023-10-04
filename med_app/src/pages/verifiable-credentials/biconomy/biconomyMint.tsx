@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BiconomySmartAccountV2 } from '@biconomy/account';
-import {
-  IHybridPaymaster,
-  SponsorUserOperationDto,
-  PaymasterMode,
-} from '@biconomy/paymaster';
+import { IHybridPaymaster, SponsorUserOperationDto, PaymasterMode } from '@biconomy/paymaster';
 import abi from './soulboundNftabi.json';
 import { ethers } from 'ethers';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SOULBOUND_NFT_CONTRACT_ADDRESS, DEPLOYER_PK } from '../../../config';
+
 
 interface Props {
   smartAccount: BiconomySmartAccountV2;
@@ -17,37 +15,12 @@ interface Props {
 
 
 export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) => {
-  const [count, setCount] = useState<number>(0);
-  const [counterContract, setCounterContract] =
-    useState<ethers.Contract | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const soulboundNftAddress = import.meta.env.VITE_SOULBOUND_NFT_CONTRACT_ADDRESS;
 
   useEffect(() => {
     setIsLoading(true);
-    getCount(false);
   }, []);
 
-  const getCount = async (isUpdating: boolean) => {
-    const contract = new ethers.Contract(soulboundNftAddress, abi, provider);
-    setCounterContract(contract);
-    const currentCount = await contract.count();
-    setCount(currentCount.toNumber());
-
-    if (isUpdating) {
-      toast.success('NFT has been issued!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-      });
-    }
-  };
 
   const mintSoulboundNft = async () => {
     console.log('Minting NFT...');
@@ -63,44 +36,69 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
         theme: 'dark',
       });
 
-      const incrementTx = new ethers.utils.Interface([
-        'function safeMint()',
-      ]);
-      const data = incrementTx.encodeFunctionData('safeMint');
+      const to = '0x59813E0B81C13d262054FD17c83460A7CE94Bbfc';
+      const tokenId = 234567;
+      const uri = 'test2';
+      console.log('tokenId: ', tokenId);
 
+      console.log("pk: ")
+      console.log(DEPLOYER_PK)
+
+      const deployer = new ethers.Wallet(DEPLOYER_PK, provider);
+      const contract = new ethers.Contract(SOULBOUND_NFT_CONTRACT_ADDRESS, abi, provider);
+      let transferCallData = contract.connect(deployer).interface.encodeFunctionData('safeMint', [to, tokenId, uri]);
+      console.log("transfer call data", transferCallData);
+      
+
+    //   const mintNftTx = contract.populateTransaction.safeMint(to, tokenId, uri);
+    //   console.log("data: ", (await mintNftTx).data);
+    //   console.log("nonce: ", (await mintNftTx).nonce);
+
+
+      // create a new ethers Interface to match the function signature function safeMint(address to, uint256 tokenId, string memory uri)
+    //   const mintSoulboundNftTx = new ethers.utils.Interface([
+    //     `function safeMint(address to, uint256 tokenId, string memory uri)`,
+    //   ]);
+
+     
+      // encode the function call with the parameters to, tokenId, uri
+    //   const funcData = mintSoulboundNftTx.encodeFunctionData('safeMint', [to, tokenId, uri]);
+      const MINT_NFT_CONTRACT_ADDRESS = '0x59813E0B81C13d262054FD17c83460A7CE94Bbfc';
+    //   console.log('**** 0 data: ');
+    //   console.log(funcData);
+
+      console.log('**** 1 MINT_NFT_CONTRACT_ADDRESS: ');
+      console.log(MINT_NFT_CONTRACT_ADDRESS);
       const tx1 = {
-        to: soulboundNftAddress,
-        data,
+        to: MINT_NFT_CONTRACT_ADDRESS,
+        data: transferCallData,
       };
 
-      const partialUserOp = await smartAccount.buildUserOp([tx1]);
-      console.log("**** 0 partialUserOp: ")
-      console.log(partialUserOp)
-      console.log("**** 1 partialUserOp.paymasterAndData: ")
-      console.log(partialUserOp.paymasterAndData)
+      const partialUserOp = (await smartAccount.buildUserOp([tx1]));
+      console.log('**** 1 partialUserOp: ');
+      console.log(partialUserOp);
+      console.log('**** 2 partialUserOp.paymasterAndData: ');
+      console.log(partialUserOp.paymasterAndData);
 
-      const BiconomyPaymaster =
-        smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+      const BiconomyPaymaster = smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
 
-        let paymasterServiceData: SponsorUserOperationDto = {
-          mode: PaymasterMode.SPONSORED,
-          smartAccountInfo: {
-            name: 'BICONOMY',
-            version: '2.0.0'
-          },
-          // optional params...
-        };
+      let paymasterServiceData: SponsorUserOperationDto = {
+        mode: PaymasterMode.SPONSORED,
+        smartAccountInfo: {
+          name: 'BICONOMY',
+          version: '2.0.0',
+        },
+        // optional params...
+      };
 
       try {
-        const paymasterAndDataResponse =
-          await BiconomyPaymaster.getPaymasterAndData(
-            partialUserOp,
-            paymasterServiceData
-          );
-        partialUserOp.paymasterAndData =
-          paymasterAndDataResponse.paymasterAndData;
-        console.log("**** 2 partialUserOp.paymasterAndData: ")
-        console.log(partialUserOp.paymasterAndData)
+        const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(
+          partialUserOp,
+          paymasterServiceData
+        );
+        partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
+        console.log('**** 3 partialUserOp.paymasterAndData: ');
+        console.log(partialUserOp.paymasterAndData);
 
         const userOpResponse = await smartAccount.sendUserOp(partialUserOp);
         const transactionDetails = await userOpResponse.wait();
@@ -110,7 +108,7 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
 
         toast.success(`Transaction Hash: ${userOpResponse.userOpHash}`, {
           position: 'top-right',
-          autoClose: 5000,
+          autoClose: 10000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -119,7 +117,7 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
           theme: 'dark',
         });
 
-        getCount(true);
+        // getCount(true);
       } catch (error) {
         console.error('Error executing transaction:', error);
         // ... handle the error if needed ...
@@ -142,7 +140,7 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
   return (
     <>
       <ToastContainer
-        position='top-right'
+        position="top-right"
         autoClose={5000}
         hideProgressBar={true}
         newestOnTop={false}
@@ -151,7 +149,7 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme='dark'
+        theme="dark"
       />
       <br></br>
       <button onClick={() => mintSoulboundNft()}>Create Soulbound NFT of DID</button>

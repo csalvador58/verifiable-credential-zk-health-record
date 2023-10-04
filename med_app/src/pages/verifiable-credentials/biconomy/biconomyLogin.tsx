@@ -12,6 +12,8 @@ import { ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from '
 import Counter from './biconomyCounter';
 import styles from '@/styles/Home.module.css';
 import { recoverPersonalSignature } from '@metamask/eth-sig-util';
+import { MintSoulboundNft } from './biconomyMint';
+import { BICONOMY_PAYMASTER_KEY, PUBLIC_MAGIC_API } from '../../../config';
 // import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
 const bundler: IBundler = new Bundler({
@@ -21,11 +23,11 @@ const bundler: IBundler = new Bundler({
 });
 
 const paymaster: IPaymaster = new BiconomyPaymaster({
-  paymasterUrl: `https://paymaster.biconomy.io/api/v1/80001/${import.meta.env.VITE_PAYMASTER_KEY}`,
+  paymasterUrl: `https://paymaster.biconomy.io/api/v1/80001/${BICONOMY_PAYMASTER_KEY}`,
 });
 
 // Initialize the Magic instance
-export const magic = new Magic(import.meta.env.VITE_PUBLIC_MAGIC_API_KEY, {
+export const magic = new Magic(PUBLIC_MAGIC_API, {
   network: {
     rpcUrl: 'https://rpc-mumbai.maticvigil.com/',
     chainId: ChainId.POLYGON_MUMBAI, // or preferred chain
@@ -168,6 +170,11 @@ export function BiconomyLogin() {
 
   };
 
+  const getNonce = async () => {
+   let nonce = await smartAccount?.getAccountAddress();
+   console.log('nonce: ', nonce);
+  }
+
   return (
     <div>
       <h1> Biconomy Smart Accounts using Magic login + Gasless Transactions</h1>
@@ -178,10 +185,12 @@ export function BiconomyLogin() {
         <div className="buttonWrapper">
           <h3>Smart account address:</h3>
           <p>{smartAccount.address}</p>
-          <Counter smartAccount={smartAccount} provider={provider} />
+          
+          <MintSoulboundNft smartAccount={smartAccount} provider={provider}/>
           <button onClick={logout}>Logout</button>
           <button onClick={getInfo}>Get Info</button>
           <button onClick={signMessage}>Sign Message</button>
+          <button onClick={getNonce}>get nonce</button>
         </div>
       )}
       <p>

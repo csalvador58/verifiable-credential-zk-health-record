@@ -4,6 +4,7 @@ import { InfoSection } from '../../components/InfoSection';
 import verfiablePresentation from './vc_store/medicationRequest_vp.json';
 import { ONYX_API } from '../../config';
 import { ToastContainer, toast } from 'react-toastify';
+import { MintSoulboundNft } from './biconomy/biconomyMint';
 
 export function VpItem(): JSX.Element {
   const theme = useMantineTheme();
@@ -11,7 +12,7 @@ export function VpItem(): JSX.Element {
 
   const resource = verfiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
 
-    // On fetch completion, the holder's signed verifiable presentation will be saved in 
+  // On fetch completion, the holder's signed verifiable presentation will be saved in
   //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json simulating the Issuers DB
   const handleVPRequest = async () => {
     try {
@@ -71,6 +72,7 @@ export function VpItem(): JSX.Element {
           <Divider />
           <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
           <Divider />
+          {/* <MintSoulboundNft /> */}
           <ToastContainer />
         </Stack>
       </InfoSection>
