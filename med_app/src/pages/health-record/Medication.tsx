@@ -6,7 +6,6 @@ import { useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import { ONYX_API } from '../../config';
-import { ToastContainer, toast } from 'react-toastify';
 
 type SignedVC = [string, boolean];
 
@@ -69,41 +68,26 @@ function VcModal({
       const url = `${ONYX_API}/create-signed-vc`;
       const method = 'POST';
 
-      const data = await toast
-        .promise(
-          fetch(url, {
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ fhir: healthRecord }),
-          }),
-          {
-            pending: 'Requesting VC...',
-            success: 'VC Requested!',
-            error: 'Error requesting VC.',
-          },
-          {
-            position: 'top-center',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          }
-        )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
-          setTimeout(() => {
-            setOpened(false);
-            setSignedVC([data.message, true]);
-          }, 1000);
-          return response.json();
-        });
+      const data = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fhir: healthRecord }),
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+
+        setTimeout(() => {
+          setOpened(false);
+          setSignedVC([data.message, true]);
+        }, 1000);
+
+
+
+        return response.json();
+      });
     } catch (error) {
       console.error(error);
     }
@@ -126,7 +110,6 @@ function VcModal({
         <Instructions name="Instructions" value={email} />
         {!!signedVC && <Button onClick={async () => await handleVCRequest()}>Submit VC Request</Button>}
       </Stack>
-      <ToastContainer />
     </Modal>
   );
 }

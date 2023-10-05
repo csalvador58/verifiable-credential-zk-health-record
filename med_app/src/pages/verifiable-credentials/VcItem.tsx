@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import verifiableCredentials from './vc_store/medicationRequest_vc.json';
 import verifiablePresentations from './vc_store/medicationRequest_vp.json';
-import { ToastContainer, toast } from 'react-toastify';
 import { ONYX_API } from '../../config';
 import { IIssuedVerifiableCredential } from './types/verifiableCredential';
 import { IVerifiablePresentation } from './types/verifiablePresentation';
@@ -19,49 +18,29 @@ export function VcItem(): JSX.Element {
   // check if itemId has already been signed
   const status = verifiablePresentations.some((vp: IVerifiablePresentation) => vp.id === itemId);
 
-  // On fetch completion, an issuer signed vc with zkp will be saved in 
+  // On fetch completion, an issuer signed vc with zkp will be saved in
   //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json simulating the Issuers DB
   const handleVCRequest = async () => {
     console.log(resource);
 
     try {
       const signedVCJwt = resource?.vc_signed;
-      
+
       const url = `${ONYX_API}/create-signed-vp`;
       const method = 'POST';
 
-      const data = await toast
-        .promise(
-          fetch(url, {
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ vc: signedVCJwt }),
-          }),
-          {
-            pending: 'Requesting VC...',
-            success: 'VC Requested!',
-            error: 'Error requesting VC.',
-          },
-          {
-            position: 'top-center',
-            autoClose: 2500,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          }
-        )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
-          setTimeout(() => {}, 1000);
-          return response.json();
-        });
+      const data = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ vc: signedVCJwt }),
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      });
     } catch (error) {
       console.error(error);
     }
@@ -91,7 +70,6 @@ export function VcItem(): JSX.Element {
             <KeyValue name="Signed Status" value={status ? 'Completed' : 'Not Signed'} />
             <Divider />
             <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
-            <ToastContainer />
           </Stack>
         </InfoSection>
       ) : (

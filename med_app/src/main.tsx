@@ -32,12 +32,12 @@ const theme: MantineThemeOverride = {
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   // <StrictMode>
-    <BrowserRouter>
-      <MedplumProvider medplum={medplum}>
-        <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
-          <App />
-        </MantineProvider>
-      </MedplumProvider>
-    </BrowserRouter>
+  <BrowserRouter>
+    <MedplumProvider medplum={medplum}>
+      <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+        <App />
+      </MantineProvider>
+    </MedplumProvider>
+  </BrowserRouter>
   // </StrictMode>
 );

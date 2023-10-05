@@ -85,7 +85,8 @@ app.post('/generate-cid', async (req: Request, res: Response, next: NextFunction
   const description =
     'Receipt for Verifiable Credentials linked to DID:key. Non-transferable, non-redeemable for fiat.';
   const external_url = 'https://w3c-ccg.github.io/did-method-key/';
-  const imageCID = 'ipfs://QmYNR56MRPf2Vc1NBuSSG95Bf4sTNarkfFhQGc7tC4qCk7';
+  // const imageCID = 'ipfs://QmYNR56MRPf2Vc1NBuSSG95Bf4sTNarkfFhQGc7tC4qCk7';
+  const imageCID = 'test';
 
   try {
     const metadataCID = await uploadMetadata({ DIDkey, description, external_url, imageCID });

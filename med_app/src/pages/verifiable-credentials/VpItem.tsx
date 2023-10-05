@@ -2,10 +2,9 @@ import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Bu
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import verifiablePresentation from './vc_store/medicationRequest_vp.json';
-import { ToastContainer, toast } from 'react-toastify';
 import { Magic, RPCError, RPCErrorCode } from 'magic-sdk';
 import { useMedplum } from '@medplum/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { DEFAULT_ECDSA_OWNERSHIP_MODULE, ECDSAOwnershipValidationModule } from '@biconomy/modules';
 import { BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from '@biconomy/account';
@@ -59,7 +58,7 @@ export function VpItem(): JSX.Element {
     try {
       // Get email from medplum login profile and sign in with Magic
       // const email = medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value;
-      const email = '';
+      const email = ''; // Set to empty string to force Magic to show UI
       if (!!email) {
         console.log('Logging in Magic with email: ', email);
         const response = await MAGIC.auth.loginWithEmailOTP({ email: email });
@@ -129,10 +128,7 @@ export function VpItem(): JSX.Element {
           if (!response.ok) {
             throw new Error(response.statusText);
           }
-          // setTimeout(() => {
-          //   console.log('response.json()');
-          //   console.log(response.json());
-          // }, 1000);
+
           return response.json();
         });
 
@@ -140,33 +136,12 @@ export function VpItem(): JSX.Element {
 
       const cid = data.message;
       const did = resource.id;
-      try {
-        // Mint NFT with DID and CID
-        toast.info('Preparing to Mint NFT', {
-          position: 'top-right',
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        });
-        console.log('cid, did');
-        console.log(cid, did);
-        await handleMintRequest({ cid });
-      } catch (error) {}
+
+      // Mint NFT with DID and CID
+      console.log('cid, did');
+      console.log(cid, did);
+      await handleMintRequest({ cid });
     } catch (error) {
-      toast.error('Error processing request', {
-        position: 'top-right',
-        autoClose: false,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
       console.error(error);
     }
   };
@@ -185,12 +160,12 @@ export function VpItem(): JSX.Element {
         <Stack spacing={0}>
           {!magicIsActive && (
             <Button onClick={async () => await signInWithMagicOTP()}>
-              Click here to complete Magic Authorization and generate a Verifiable Proof
+              Click here to Authorize with your email login
             </Button>
           )}
           {magicIsActive && (
             <Button onClick={async () => await handleVPRequest()}>
-              Click here to claim a proof of your Verifiable Credential
+              {`Submit now to claim your NFT receipt of this DID:key into your Smart Account`}
             </Button>
           )}
           <Divider />
@@ -200,7 +175,6 @@ export function VpItem(): JSX.Element {
           <Divider />
           <Button onClick={async () => await checkLoginStatus()}>Check Login Status</Button>
           {/* {magicIsActive && <Button onClick={async () => await logout()}>Logout</Button>} */}
-          <ToastContainer />
         </Stack>
       </InfoSection>
     </Box>
@@ -256,29 +230,6 @@ interface MintRequest {
 }
 
 const handleMintRequest = async ({ cid }: MintRequest) => {
-  toast('Minting NFT now in progress', {
-    position: 'top-right',
-    autoClose: false,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: 'light',
-  });
-  // console.log('Logging in with Magic...');
-  // // Magic login
-  // toast.info('Please log into Magic to continue...', {
-  //   position: 'top-right',
-  //   autoClose: 2500,
-  //   hideProgressBar: false,
-  //   closeOnClick: true,
-  //   pauseOnHover: false,
-  //   draggable: false,
-  //   progress: undefined,
-  //   theme: 'light',
-  // });
-  // await MAGIC.wallet.connectWithUI();
 
   // Setup biconomy smart account
   const web3Provider = new ethers.providers.Web3Provider(MAGIC.rpcProvider as any);
@@ -297,6 +248,7 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
   });
 
   console.log('Minting NFT...');
+ 
   try {
     const to = await biconomySmartAccount.getAccountAddress();
     console.log('**** Smart Account Address: ', to);
@@ -307,63 +259,24 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
     const tokenId = Math.floor(Math.random() * 10_000_000);
     const uri = cid;
 
-    try {
-      const { partialUserOp, BiconomyPaymaster, paymasterServiceData } = await setupMintUserOp({
-        to,
-        tokenId,
-        uri,
-        biconomySmartAccount,
-        web3Provider,
-      });
+    const { partialUserOp, BiconomyPaymaster, paymasterServiceData } = await setupMintUserOp({
+      to,
+      tokenId,
+      uri,
+      biconomySmartAccount,
+      web3Provider,
+    });
 
-      const userOpResponse = await processPaymaster({
-        partialUserOp,
-        biconomySmartAccount,
-        BiconomyPaymaster,
-        paymasterServiceData,
-      });
+    const userOpResponse = await processPaymaster({
+      partialUserOp,
+      biconomySmartAccount,
+      BiconomyPaymaster,
+      paymasterServiceData,
+    });
 
-      toast.success(`Transaction Hash: ${userOpResponse.userOpHash}`, {
-        position: 'top-right',
-        autoClose: 10000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: 'light',
-      });
-      toast.warn(
-        'Please allow 5-10 minutes before submitting another Mint request. Request will likely fail if executed before this time',
-        {
-          position: 'top-right',
-          autoClose: false,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-        }
-      );
-
-      // getCount(true);
-    } catch (error) {
-      console.error('Error executing transaction:', error);
-      // ... handle the error if needed ...
-    }
   } catch (error) {
     console.error('Error executing transaction:', error);
-    toast.error('Error occurred, check the console', {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'dark',
-    });
+
   }
 };
 
