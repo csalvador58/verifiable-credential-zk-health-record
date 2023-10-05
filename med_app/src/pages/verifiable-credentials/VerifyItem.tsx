@@ -1,100 +1,35 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
-import { StatusBadge } from '@medplum/react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import verifiableCredentials from './vc_store/medicationRequest_vc.json';
 import verifiablePresentations from './vc_store/medicationRequest_vp.json';
-import { ONYX_API } from '../../config';
-import { IIssuedVerifiableCredential } from './types/verifiableCredential';
+import { useMedplum } from '@medplum/react';
 import { IVerifiablePresentation } from './types/verifiablePresentation';
-import { toast } from 'react-toastify';
 
 export function VerifyItem(): JSX.Element {
   const theme = useMantineTheme();
   const { itemId } = useParams();
+  const medplum = useMedplum();
 
-  const credentials = verifiableCredentials as IIssuedVerifiableCredential[];
-  const resource = credentials.find((vc) => vc.id === itemId);
+  const credentials = verifiablePresentations as IVerifiablePresentation[];
+  const resource = credentials.find((vp: IVerifiablePresentation) => vp.id == itemId)!;
 
-  // check if itemId has already been signed
-  const status = verifiablePresentations.some((vp: IVerifiablePresentation) => vp.id === itemId);
-
-  // On fetch completion, an issuer signed vc with zkp will be saved in
-  //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json simulating the Issuers DB
-  const handleVCRequest = async () => {
-    console.log(resource);
-
-    try {
-      const signedVCJwt = resource?.vc_signed;
-
-      const url = `${ONYX_API}/create-signed-vp`;
-      const method = 'POST';
-
-      const data = await toast
-        .promise(
-          fetch(url, {
-            method: method,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ vc: signedVCJwt }),
-          }),
-          {
-            pending: 'Processing signature on Verifiable Presentation...',
-            success: 'Verifiable Presentation signed successfully!',
-            error: 'Signature failed. Please try again.',
-          },
-          {
-            position: 'top-center',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light',
-          }
-        )
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(response.statusText);
-          }
-          return response.json();
-        });
-    } catch (error) {
-      console.error(error);
-    }
+  const logout = async () => {
+    // console.log(await MAGIC.user.logout());
   };
 
   return (
     <Box p="xl">
-      <Title mb="lg">Credential Details</Title>
-      {!!resource ? (
-        <InfoSection title={'ID: ' + resource.id}>
-          <Stack spacing={0}>
-            {!status && (
-              <Button onClick={async () => await handleVCRequest()}>
-                Click to sign your issued Verifiable Credential
-              </Button>
-            )}
-            <KeyValue name="Resource Type" value={resource.vc_raw.credentialSubject.resourceType} />
-            <KeyValue name="Requested Date" value={resource.vc_raw.credentialSubject.authoredOn} />
-            <Divider />
-            <KeyValue
-              name="Medication Request"
-              value={JSON.parse(resource.vc_raw.credentialSubject.medicationCodeableConcept).text}
-            />
-            <Divider />
-            <AccordionDisplay DIDIssuer={resource.vc_raw.issuer.id} VerifiableCredential={resource.vc_signed} />
-            <Divider />
-            <KeyValue name="Signed Status" value={status ? 'Completed' : 'Not Signed'} />
-            <Divider />
-            <StatusBadge status={resource.vc_raw.credentialSubject.status as string} />
-          </Stack>
-        </InfoSection>
-      ) : (
-        <Text>No Verifiable Credentials found.</Text>
-      )}
+      <Title mb="lg">Verifiable Proof Details</Title>
+      <InfoSection title={'ID: ' + resource.id}>
+        <Stack spacing={0}>
+          <Divider />
+          <Button onClick={async () => await logout()}>Verify</Button>
+          <KeyValue name="Date Issued " value={resource.date_signed as string} />
+          <Divider />
+          <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
+          <Divider />
+        </Stack>
+      </InfoSection>
     </Box>
   );
 }
@@ -113,16 +48,16 @@ function KeyValue({ name, value }: { name: string; value: string | undefined }):
 }
 
 interface AccordionProps {
-  DIDIssuer: string;
+  DID_VC: string;
   VerifiableCredential: string;
 }
 
-function AccordionDisplay({ DIDIssuer, VerifiableCredential }: AccordionProps): JSX.Element {
+function AccordionDisplay({ DID_VC, VerifiableCredential }: AccordionProps): JSX.Element {
   return (
     <Accordion defaultValue="Signed Verifiable Credential">
-      <Accordion.Item value={DIDIssuer}>
+      <Accordion.Item value={DID_VC}>
         <Accordion.Control>
-          <AccordionLabel DIDIssuer={DIDIssuer} VerifiableCredential={''} />
+          <AccordionLabel DID_VC={DID_VC} VerifiableCredential={''} />
         </Accordion.Control>
         <Accordion.Panel>{VerifiableCredential}</Accordion.Panel>
       </Accordion.Item>
@@ -130,13 +65,13 @@ function AccordionDisplay({ DIDIssuer, VerifiableCredential }: AccordionProps): 
   );
 }
 
-function AccordionLabel({ DIDIssuer }: AccordionProps): JSX.Element {
+function AccordionLabel({ DID_VC }: AccordionProps): JSX.Element {
   return (
     <Group>
       <div>
-        <Text>{'VC Issuer: ' + DIDIssuer}</Text>
+        {/* <Text>{"Associated with VC: " + DID_VC}</Text> */}
         <Text size="sm" c="dimmed" fw={400}>
-          Click to View Verifiable Encrypted Credential
+          Click to View Verifiable Presentation Token
         </Text>
       </div>
     </Group>
