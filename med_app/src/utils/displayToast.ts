@@ -9,7 +9,7 @@ const displayToast = ({
   switch (type) {
   case 'default':
     toast(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -21,7 +21,7 @@ const displayToast = ({
     break
   case 'info':
     toast.info(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -33,7 +33,7 @@ const displayToast = ({
     break
   case 'success':
     toast.success(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -45,7 +45,7 @@ const displayToast = ({
     break
   case 'warning':
     toast.warn(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: false,
       hideProgressBar: false,
       closeOnClick: true,
@@ -57,7 +57,7 @@ const displayToast = ({
     break
   case 'error':
     toast.error(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,

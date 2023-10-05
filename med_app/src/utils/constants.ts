@@ -3,7 +3,7 @@ import { Magic } from 'magic-sdk';
 import { ChainId } from '@biconomy/core-types';
 import { DEFAULT_ENTRYPOINT_ADDRESS } from '@biconomy/account';
 import { IPaymaster, BiconomyPaymaster } from '@biconomy/paymaster';
-import { BICONOMY_PAYMASTER_KEY, PUBLIC_MAGIC_API } from '../config';
+import { ALCHEMY_API_KEY, BICONOMY_PAYMASTER_KEY, PUBLIC_MAGIC_API } from '../config';
 
 export const onyxApi = {
   APP_VERSION: '1.0.0',
@@ -22,7 +22,8 @@ export const PAYMASTER: IPaymaster = new BiconomyPaymaster({
 
 export const MAGIC = new Magic(PUBLIC_MAGIC_API, {
   network: {
-    rpcUrl: 'https://rpc-mumbai.maticvigil.com/',
+    // rpcUrl: 'https://rpc-mumbai.maticvigil.com/',
+    rpcUrl: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_API_KEY}}`,
     chainId: ChainId.POLYGON_MUMBAI, // or preferred chain
   },
 });

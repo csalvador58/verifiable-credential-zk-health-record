@@ -1,5 +1,5 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { Magic, RPCError, RPCErrorCode } from 'magic-sdk';
@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { DEFAULT_ECDSA_OWNERSHIP_MODULE, ECDSAOwnershipValidationModule } from '@biconomy/modules';
 import { BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from '@biconomy/account';
-import { ChainId } from '@biconomy/core-types';
+import { ChainId, UserOperation } from '@biconomy/core-types';
 import { BUNDLER, MAGIC, PAYMASTER } from '../../utils/constants';
 import {
   IHybridPaymaster,
@@ -25,7 +25,8 @@ import { IVerifiablePresentation } from './types/verifiablePresentation';
 
 export function VpItem(): JSX.Element {
   const [magicIsActive, setMagicIsActive] = useState<boolean>(false);
-  const [isMinting, setIsMinting] = useState<boolean>(false);
+  const [isMinted, setIsMinted] = useState<boolean>(false);
+  const [mintedTokenId, setMintedTokenId] = useState<number>(0);
   const theme = useMantineTheme();
   const { itemId } = useParams();
   const medplum = useMedplum();
@@ -96,7 +97,21 @@ export function VpItem(): JSX.Element {
   };
 
   const handleMintNFTRequest = async () => {
-    if (!resource.id) return;
+    if (!resource.id) {
+      displayToast({
+        message: 'Unexpected error, please try again.',
+        type: 'error',
+      });
+      console.log('resource.id is undefined');
+      throw new Error('resource.id is undefined');
+    } else if (!(await MAGIC.user.isLoggedIn())) {
+      displayToast({
+        message: 'Please login with Magic to mint NFT.',
+        type: 'error',
+      });
+      console.log('MAGIC.rpcProvider is undefined');
+      throw new Error('MAGIC.rpcProvider is undefined');
+    }
 
     try {
       const url = `${ONYX_API}/generate-cid`;
@@ -144,12 +159,31 @@ export function VpItem(): JSX.Element {
       // Mint NFT with DID and CID
       console.log('cid, did');
       console.log(cid, did);
-      await handleMintRequest({ cid });
+      const result = await toast.promise(
+        handleMintRequest({ cid }),
+        {
+          pending: 'NFT creation in progress',
+          success: 'Successfully minted NFT!',
+          error: 'Error occurred during transaction. Please try again.',
+        },
+        {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        }
+      );
+      setMintedTokenId(result);
+      setIsMinted(true); // Display link to Verifiable Credentials section
     } catch (error) {
       console.error(error);
       displayToast({
         message: 'Error with transactions. Please try again after 10 minutes.',
-        type: 'default',
+        type: 'error',
       });
     }
   };
@@ -158,8 +192,8 @@ export function VpItem(): JSX.Element {
   //   console.log(await MAGIC.user.isLoggedIn());
   // };
   // const logout = async () => {
-  //   console.log(await MAGIC.user.logout())
-  // }
+  //   console.log(await MAGIC.user.logout());
+  // };
 
   return (
     <Box p="xl">
@@ -185,6 +219,20 @@ export function VpItem(): JSX.Element {
           {/* {magicIsActive && <Button onClick={async () => await logout()}>Logout</Button>} */}
         </Stack>
       </InfoSection>
+      {isMinted && mintedTokenId !== 0 && (
+        <>
+          <Link
+            target="_blank"
+            to={`https://testnets.opensea.io/assets/mumbai/${SOULBOUND_NFT_CONTRACT_ADDRESS}/${mintedTokenId}`}
+            style={{ textDecoration: 'none' }}
+          >
+            <span style={{ fontWeight: 'bold', color: 'blue', marginLeft: '1rem' }}>
+              {' '}
+              Click here to view your NFT Token# {mintedTokenId} on OpenSea.
+            </span>
+          </Link>{' '}
+        </>
+      )}
     </Box>
   );
 }
@@ -237,35 +285,24 @@ interface MintRequest {
   cid: string;
 }
 
-const handleMintRequest = async ({ cid }: MintRequest) => {
-  displayToast({
-    message: 'Preparing for NFT minting',
-    type: 'default',
-  });
-
-  // Setup biconomy smart account
-  const web3Provider = new ethers.providers.Web3Provider(MAGIC.rpcProvider as any);
-  const module = await ECDSAOwnershipValidationModule.create({
-    signer: web3Provider.getSigner(),
-    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
-  });
-
-  let biconomySmartAccount = await BiconomySmartAccountV2.create({
-    chainId: ChainId.POLYGON_MUMBAI,
-    bundler: BUNDLER,
-    paymaster: PAYMASTER,
-    entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-    defaultValidationModule: module,
-    activeValidationModule: module,
-  });
-
-  console.log('Minting NFT...');
-
-  displayToast({
-    message: 'Setting up Paymaster configuration',
-    type: 'info',
-  });
+const handleMintRequest = async ({ cid }: MintRequest): Promise<number> => {
   try {
+    // Setup biconomy smart account
+    const web3Provider = new ethers.providers.Web3Provider(MAGIC.rpcProvider as any);
+    const module = await ECDSAOwnershipValidationModule.create({
+      signer: web3Provider.getSigner(),
+      moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+    });
+    let biconomySmartAccount = await BiconomySmartAccountV2.create({
+      chainId: ChainId.POLYGON_MUMBAI,
+      bundler: BUNDLER,
+      paymaster: PAYMASTER,
+      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+      defaultValidationModule: module,
+      activeValidationModule: module,
+    });
+
+    console.log('Minting NFT...');
     const to = await biconomySmartAccount.getAccountAddress();
     console.log('**** Smart Account Address: ', to);
     console.log(
@@ -275,13 +312,13 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
     const tokenId = Math.floor(Math.random() * 10_000_000);
     const uri = cid;
 
-    const { partialUserOp, BiconomyPaymaster, paymasterServiceData } = await setupMintUserOp({
+    const { partialUserOp, BiconomyPaymaster, paymasterServiceData } = (await setupMintUserOp({
       to,
       tokenId,
       uri,
       biconomySmartAccount,
       web3Provider,
-    });
+    })) as MintUserOpResponse;
 
     displayToast({
       message: 'Submitting transaction to Paymaster',
@@ -294,8 +331,10 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
       paymasterServiceData,
     });
     console.log('userOpResponse: ', userOpResponse);
+    return tokenId;
   } catch (error) {
     console.error('Error executing transaction:', error);
+    return 0;
   }
 };
 
@@ -307,31 +346,44 @@ interface MintUserOp {
   web3Provider: ethers.providers.Web3Provider;
 }
 
+interface MintUserOpResponse {
+  partialUserOp: Partial<UserOperation>;
+  BiconomyPaymaster: BiconomyPaymaster;
+  paymasterServiceData: SponsorUserOperationDto;
+}
+
 const setupMintUserOp = async ({ to, tokenId, uri, biconomySmartAccount, web3Provider }: MintUserOp) => {
-  const deployer = new ethers.Wallet(DEPLOYER_PK, web3Provider);
-  const contract = new ethers.Contract(SOULBOUND_NFT_CONTRACT_ADDRESS, abi, web3Provider);
-  let transferCallData = contract.connect(deployer).interface.encodeFunctionData('safeMint', [to, tokenId, uri]);
+  try {
+    const deployer = new ethers.Wallet(DEPLOYER_PK, web3Provider);
+    const contract = new ethers.Contract(SOULBOUND_NFT_CONTRACT_ADDRESS, abi, web3Provider);
+    let transferCallData = contract.connect(deployer).interface.encodeFunctionData('safeMint', [to, tokenId, uri]);
 
-  console.log('**** MINT_NFT_CONTRACT_ADDRESS: ');
-  console.log(SOULBOUND_NFT_CONTRACT_ADDRESS);
-  const tx1 = {
-    to: SOULBOUND_NFT_CONTRACT_ADDRESS,
-    data: transferCallData,
-  };
+    console.log('**** MINT_NFT_CONTRACT_ADDRESS: ');
+    console.log(SOULBOUND_NFT_CONTRACT_ADDRESS);
+    const tx1 = {
+      to: SOULBOUND_NFT_CONTRACT_ADDRESS,
+      data: transferCallData,
+    };
+    const partialUserOp: Partial<UserOperation> = await biconomySmartAccount.buildUserOp([tx1]);
+    const BiconomyPaymaster = biconomySmartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
 
-  const partialUserOp = await biconomySmartAccount.buildUserOp([tx1]);
-  const BiconomyPaymaster = biconomySmartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+    let paymasterServiceData: SponsorUserOperationDto = {
+      mode: PaymasterMode.SPONSORED,
+      smartAccountInfo: {
+        name: 'BICONOMY',
+        version: '2.0.0',
+      },
+      // optional params...
+    };
 
-  let paymasterServiceData: SponsorUserOperationDto = {
-    mode: PaymasterMode.SPONSORED,
-    smartAccountInfo: {
-      name: 'BICONOMY',
-      version: '2.0.0',
-    },
-    // optional params...
-  };
-
-  return { partialUserOp, BiconomyPaymaster, paymasterServiceData };
+    return { partialUserOp, BiconomyPaymaster, paymasterServiceData } as MintUserOpResponse;
+  } catch (error) {
+    console.error('Error executing transaction:', error);
+    displayToast({
+      message: 'Error executing transaction. Please try again.',
+      type: 'error',
+    });
+  }
 };
 
 const processPaymaster = async ({
@@ -340,26 +392,25 @@ const processPaymaster = async ({
   BiconomyPaymaster,
   paymasterServiceData,
 }: any) => {
-  displayToast({
-    message: 'Minting NFT now in progress',
-    type: 'info',
-  });
-  const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
-  partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
+  try {
+    const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
+    partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-  console.log('**** partialUserOp.paymasterAndData: ');
-  console.log(partialUserOp.paymasterAndData);
+    console.log('**** partialUserOp.paymasterAndData: ');
+    console.log(partialUserOp.paymasterAndData);
 
-  const userOpResponse = await biconomySmartAccount.sendUserOp(partialUserOp);
-  const transactionDetails = await userOpResponse.wait();
+    const userOpResponse = await biconomySmartAccount.sendUserOp(partialUserOp);
+    const transactionDetails = await userOpResponse.wait();
 
-  console.log('Transaction Details:', transactionDetails);
-  console.log('Transaction Hash:', userOpResponse.userOpHash);
+    console.log('Transaction Details:', transactionDetails);
+    console.log('Transaction Hash:', userOpResponse.userOpHash);
 
-  displayToast({
-    message: 'Minting NFT successful!',
-    type: 'default',
-  });
-
-  return userOpResponse;
+    return userOpResponse;
+  } catch (error) {
+    console.error('Error executing transaction:', error);
+    displayToast({
+      message: 'Error executing transaction. Please try again.',
+      type: 'error',
+    });
+  }
 };
