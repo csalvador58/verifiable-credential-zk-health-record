@@ -5,6 +5,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const medplum = new MedplumClient({
   onUnauthenticated: () => (window.location.href = '/'),
@@ -35,6 +37,7 @@ root.render(
   <BrowserRouter>
     <MedplumProvider medplum={medplum}>
       <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
+        <ToastContainer />
         <App />
       </MantineProvider>
     </MedplumProvider>

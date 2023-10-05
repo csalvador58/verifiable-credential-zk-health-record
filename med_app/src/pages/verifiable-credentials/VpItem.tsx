@@ -1,7 +1,7 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import verifiablePresentation from './vc_store/medicationRequest_vp.json';
+import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { Magic, RPCError, RPCErrorCode } from 'magic-sdk';
 import { useMedplum } from '@medplum/react';
 import { useEffect, useState } from 'react';
@@ -19,6 +19,9 @@ import {
 } from '@biconomy/paymaster';
 import { SOULBOUND_NFT_CONTRACT_ADDRESS, DEPLOYER_PK, ONYX_API } from '../../config';
 import abi from './biconomy/soulboundNftAbi.json';
+import { toast } from 'react-toastify';
+import displayToast from '../../utils/displayToast';
+import { IVerifiablePresentation } from './types/verifiablePresentation';
 
 export function VpItem(): JSX.Element {
   const [magicIsActive, setMagicIsActive] = useState<boolean>(false);
@@ -27,7 +30,8 @@ export function VpItem(): JSX.Element {
   const { itemId } = useParams();
   const medplum = useMedplum();
 
-  const resource = verifiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
+  const credentials = verifiablePresentations as IVerifiablePresentation[];
+  const resource = credentials.find((vp: IVerifiablePresentation) => vp.id == itemId)!;
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -91,9 +95,9 @@ export function VpItem(): JSX.Element {
     }
   };
 
-  // On fetch completion, the holder's signed verifiable presentation will be saved in
-  //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json simulating the Issuers DB
-  const handleVPRequest = async () => {
+  const handleMintNFTRequest = async () => {
+    if (!resource.id) return;
+
     try {
       const url = `${ONYX_API}/generate-cid`;
       const method = 'POST';
@@ -109,9 +113,9 @@ export function VpItem(): JSX.Element {
             body: JSON.stringify({ did: resource.id }),
           }),
           {
-            pending: 'Requesting VP...',
-            success: 'VP Requested!',
-            error: 'Error requesting VP.',
+            pending: 'Uploading DID and Metadata to IPFS',
+            success: 'Successfully uploaded DID and Metadata to IPFS!',
+            error: 'Error uploading DID and Metadata to IPFS. Please try again.',
           },
           {
             position: 'top-right',
@@ -143,12 +147,16 @@ export function VpItem(): JSX.Element {
       await handleMintRequest({ cid });
     } catch (error) {
       console.error(error);
+      displayToast({
+        message: 'Error with transactions. Please try again after 10 minutes.',
+        type: 'default',
+      });
     }
   };
 
-  const checkLoginStatus = async () => {
-    console.log(await MAGIC.user.isLoggedIn());
-  };
+  // const checkLoginStatus = async () => {
+  //   console.log(await MAGIC.user.isLoggedIn());
+  // };
   // const logout = async () => {
   //   console.log(await MAGIC.user.logout())
   // }
@@ -164,7 +172,7 @@ export function VpItem(): JSX.Element {
             </Button>
           )}
           {magicIsActive && (
-            <Button onClick={async () => await handleVPRequest()}>
+            <Button onClick={async () => await handleMintNFTRequest()}>
               {`Submit now to claim your NFT receipt of this DID:key into your Smart Account`}
             </Button>
           )}
@@ -173,7 +181,7 @@ export function VpItem(): JSX.Element {
           <Divider />
           <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
           <Divider />
-          <Button onClick={async () => await checkLoginStatus()}>Check Login Status</Button>
+          {/* <Button onClick={async () => await checkLoginStatus()}>Check Login Status</Button> */}
           {/* {magicIsActive && <Button onClick={async () => await logout()}>Logout</Button>} */}
         </Stack>
       </InfoSection>
@@ -230,6 +238,10 @@ interface MintRequest {
 }
 
 const handleMintRequest = async ({ cid }: MintRequest) => {
+  displayToast({
+    message: 'Preparing for NFT minting',
+    type: 'default',
+  });
 
   // Setup biconomy smart account
   const web3Provider = new ethers.providers.Web3Provider(MAGIC.rpcProvider as any);
@@ -248,7 +260,11 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
   });
 
   console.log('Minting NFT...');
- 
+
+  displayToast({
+    message: 'Setting up Paymaster configuration',
+    type: 'info',
+  });
   try {
     const to = await biconomySmartAccount.getAccountAddress();
     console.log('**** Smart Account Address: ', to);
@@ -267,16 +283,19 @@ const handleMintRequest = async ({ cid }: MintRequest) => {
       web3Provider,
     });
 
+    displayToast({
+      message: 'Submitting transaction to Paymaster',
+      type: 'info',
+    });
     const userOpResponse = await processPaymaster({
       partialUserOp,
       biconomySmartAccount,
       BiconomyPaymaster,
       paymasterServiceData,
     });
-
+    console.log('userOpResponse: ', userOpResponse);
   } catch (error) {
     console.error('Error executing transaction:', error);
-
   }
 };
 
@@ -321,6 +340,10 @@ const processPaymaster = async ({
   BiconomyPaymaster,
   paymasterServiceData,
 }: any) => {
+  displayToast({
+    message: 'Minting NFT now in progress',
+    type: 'info',
+  });
   const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
   partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
@@ -332,6 +355,11 @@ const processPaymaster = async ({
 
   console.log('Transaction Details:', transactionDetails);
   console.log('Transaction Hash:', userOpResponse.userOpHash);
+
+  displayToast({
+    message: 'Minting NFT successful!',
+    type: 'default',
+  });
 
   return userOpResponse;
 };

@@ -160,7 +160,7 @@ async fn create_zkp_medical_request(
     // transform zkp_receipt to json object as is
     let zkp_receipt_json_object = serde_json::to_string(&zkp_receipt).unwrap();
 
-    // write response_object to file
+    // write receipt to file located in root of the project
     let mut file = std::fs::File::create("zkp_receipt.json").unwrap();
     file.write_all(zkp_receipt_json_object.as_bytes()).unwrap();
 

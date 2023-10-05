@@ -7,6 +7,7 @@ import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { ONYX_API } from '../../config';
 import { IIssuedVerifiableCredential } from './types/verifiableCredential';
 import { IVerifiablePresentation } from './types/verifiablePresentation';
+import { toast } from 'react-toastify';
 
 export function VcItem(): JSX.Element {
   const theme = useMantineTheme();
@@ -29,18 +30,37 @@ export function VcItem(): JSX.Element {
       const url = `${ONYX_API}/create-signed-vp`;
       const method = 'POST';
 
-      const data = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ vc: signedVCJwt }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        return response.json();
-      });
+      const data = await toast
+        .promise(
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ vc: signedVCJwt }),
+          }),
+          {
+            pending: 'Processing signature on Verifiable Presentation...',
+            success: 'Verifiable Presentation signed successfully!',
+            error: 'Signature failed. Please try again.',
+          },
+          {
+            position: 'top-center',
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          }
+        )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          return response.json();
+        });
     } catch (error) {
       console.error(error);
     }

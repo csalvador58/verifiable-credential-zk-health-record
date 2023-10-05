@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
 import { ONYX_API } from '../../config';
+import { toast } from 'react-toastify';
 
 type SignedVC = [string, boolean];
 
@@ -68,26 +69,43 @@ function VcModal({
       const url = `${ONYX_API}/create-signed-vc`;
       const method = 'POST';
 
-      const data = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fhir: healthRecord }),
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
+      const data = await toast
+        .promise(
+          fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fhir: healthRecord }),
+          }),
+          {
+            pending: 'Verifiable Credential request in progress...',
+            success: 'Verifiable Credential request successful!',
+            error: 'Verifiable Credential request failed. Please try again.',
+          },
+          {
+            position: 'top-center',
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'light',
+          }
+        )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
 
-        setTimeout(() => {
-          setOpened(false);
-          setSignedVC([data.message, true]);
-        }, 1000);
+          setTimeout(() => {
+            setOpened(false);
+            setSignedVC([data.message, true]);
+          }, 1000);
 
-
-
-        return response.json();
-      });
+          return response.json();
+        });
     } catch (error) {
       console.error(error);
     }
