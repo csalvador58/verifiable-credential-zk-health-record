@@ -5,14 +5,12 @@ import abi from './soulboundNftabi.json';
 import { ethers } from 'ethers';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { SOULBOUND_NFT_CONTRACT_ADDRESS, DEPLOYER_PK } from '../../../config';
-
+import { SOULBOUND_NFT_CONTRACT_ADDRESS, DEPLOYER_PK, HOLDER_ES256K_PRIVATE_KEY } from '../../../config';
 
 interface Props {
   smartAccount: BiconomySmartAccountV2;
   provider: ethers.providers.Provider;
 }
-
 
 export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -20,7 +18,6 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
   useEffect(() => {
     setIsLoading(true);
   }, []);
-
 
   const mintSoulboundNft = async () => {
     console.log('Minting NFT...');
@@ -37,44 +34,47 @@ export const MintSoulboundNft: React.FC<Props> = ({ smartAccount, provider }) =>
       });
 
       const to = '0x59813E0B81C13d262054FD17c83460A7CE94Bbfc';
-      const tokenId = 234567;
+      //   const tokenId = 5678910;
+      // create random tokenId with numbers only
+      const tokenId = Math.floor(Math.random() * 10000000000);
       const uri = 'test2';
       console.log('tokenId: ', tokenId);
 
-      console.log("pk: ")
-      console.log(DEPLOYER_PK)
+      console.log('pk: ');
+      console.log(DEPLOYER_PK);
 
       const deployer = new ethers.Wallet(DEPLOYER_PK, provider);
       const contract = new ethers.Contract(SOULBOUND_NFT_CONTRACT_ADDRESS, abi, provider);
       let transferCallData = contract.connect(deployer).interface.encodeFunctionData('safeMint', [to, tokenId, uri]);
-      console.log("transfer call data", transferCallData);
-      
+      console.log('transfer call data', transferCallData);
 
-    //   const mintNftTx = contract.populateTransaction.safeMint(to, tokenId, uri);
-    //   console.log("data: ", (await mintNftTx).data);
-    //   console.log("nonce: ", (await mintNftTx).nonce);
+      //   const current_user = new ethers.Wallet(HOLDER_ES256K_PRIVATE_KEY, provider);
+      const nonce = await provider.getTransactionCount('0x59813E0B81C13d262054FD17c83460A7CE94Bbfc');
+      console.log('nonce: ', nonce);
 
+      //   const mintNftTx = contract.populateTransaction.safeMint(to, tokenId, uri);
+      //   console.log("data: ", (await mintNftTx).data);
+      //   console.log("nonce: ", (await mintNftTx).nonce);
 
       // create a new ethers Interface to match the function signature function safeMint(address to, uint256 tokenId, string memory uri)
-    //   const mintSoulboundNftTx = new ethers.utils.Interface([
-    //     `function safeMint(address to, uint256 tokenId, string memory uri)`,
-    //   ]);
+      //   const mintSoulboundNftTx = new ethers.utils.Interface([
+      //     `function safeMint(address to, uint256 tokenId, string memory uri)`,
+      //   ]);
 
-     
       // encode the function call with the parameters to, tokenId, uri
-    //   const funcData = mintSoulboundNftTx.encodeFunctionData('safeMint', [to, tokenId, uri]);
-      const MINT_NFT_CONTRACT_ADDRESS = '0x59813E0B81C13d262054FD17c83460A7CE94Bbfc';
-    //   console.log('**** 0 data: ');
-    //   console.log(funcData);
+      //   const funcData = mintSoulboundNftTx.encodeFunctionData('safeMint', [to, tokenId, uri]);
+
+      //   console.log('**** 0 data: ');
+      //   console.log(funcData);
 
       console.log('**** 1 MINT_NFT_CONTRACT_ADDRESS: ');
-      console.log(MINT_NFT_CONTRACT_ADDRESS);
+      console.log(SOULBOUND_NFT_CONTRACT_ADDRESS);
       const tx1 = {
-        to: MINT_NFT_CONTRACT_ADDRESS,
+        to: SOULBOUND_NFT_CONTRACT_ADDRESS,
         data: transferCallData,
       };
 
-      const partialUserOp = (await smartAccount.buildUserOp([tx1]));
+      const partialUserOp = await smartAccount.buildUserOp([tx1]);
       console.log('**** 1 partialUserOp: ');
       console.log(partialUserOp);
       console.log('**** 2 partialUserOp.paymasterAndData: ');

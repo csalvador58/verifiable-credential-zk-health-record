@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import SocialLogin from '@biconomy/web3-auth';
 import { Wallet, providers, ethers } from 'ethers';
 import { ChainId } from '@biconomy/core-types';
-import { Magic } from 'magic-sdk';
-import { IBundler, Bundler } from '@biconomy/bundler';
+
+
 import { BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from '@biconomy/account';
-import { IPaymaster, BiconomyPaymaster } from '@biconomy/paymaster';
+
 import { ECDSAOwnershipValidationModule, DEFAULT_ECDSA_OWNERSHIP_MODULE } from '@biconomy/modules';
 import Counter from './biconomyCounter';
 import styles from '@/styles/Home.module.css';
@@ -16,23 +16,7 @@ import { MintSoulboundNft } from './biconomyMint';
 import { BICONOMY_PAYMASTER_KEY, PUBLIC_MAGIC_API } from '../../../config';
 // import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
-const bundler: IBundler = new Bundler({
-  bundlerUrl: 'https://bundler.biconomy.io/api/v2/80001/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44',
-  chainId: ChainId.POLYGON_MUMBAI,
-  entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-});
 
-const paymaster: IPaymaster = new BiconomyPaymaster({
-  paymasterUrl: `https://paymaster.biconomy.io/api/v1/80001/${BICONOMY_PAYMASTER_KEY}`,
-});
-
-// Initialize the Magic instance
-export const magic = new Magic(PUBLIC_MAGIC_API, {
-  network: {
-    rpcUrl: 'https://rpc-mumbai.maticvigil.com/',
-    chainId: ChainId.POLYGON_MUMBAI, // or preferred chain
-  },
-});
 
 export function BiconomyLogin() {
   const [smartAccount, setSmartAccount] = useState<any>(null);
@@ -171,8 +155,8 @@ export function BiconomyLogin() {
   };
 
   const getNonce = async () => {
-   let nonce = await smartAccount?.getAccountAddress();
-   console.log('nonce: ', nonce);
+   let nonce = await smartAccount.getNonce();
+   console.log('nonce: ', ethers.utils.formatUnits(nonce, 'wei'));
   }
 
   return (
