@@ -151,15 +151,15 @@ function Instructions({ name, value }: { name: string; value: string | undefined
         {name}
       </Text>
       <div>
-        Click the submit button to request a Verifiable Credential for this medical record. Your Health Provider will
-        issue a signed credential containing a digital version of this record. After a few moments, visit the{' '}
+        Click the submit button to request a Verifiable Credential for this medical record. Your Healthcare Provider
+        will issue a signed credential containing a digital proof version of this record. After a few moments, visit the{' '}
         <Link to="/vc-main" style={{ textDecoration: 'none' }}>
           <span style={{ fontWeight: 'bold', color: 'blue' }}> Verifiable Credential</span>
         </Link>{' '}
-        section of this site to view the proof of your credential. At any time, you can claim this verifiable proof into
-        your smart account that is associated with your email{' '}
-        <span style={{ fontWeight: 'bold', color: 'blue' }}>{value}</span>. Present this proof of your verifiable
-        credentials to a verifier to process your healthcare request.
+        section of this site to view the proof of your credential. At any time, you can claim an NFT receipt containing
+        the DID:key associated with this verifiable credential. Your Smart Account is linked to your login email and the
+        NFT is non-transferable. <span style={{ fontWeight: 'bold', color: 'blue' }}>{value}</span>. Present the DID:key
+        to a verifier who will perform a verification via a DID Registry.
       </div>
     </div>
   );

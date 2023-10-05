@@ -22,7 +22,7 @@ import { HomePage } from './pages/HomePage';
 import { Messages } from './pages/MessagesPage';
 import { ObservationPage } from './pages/ObservationPage';
 import { SignOutPage } from './pages/SignOutPage';
-import { BiconomyLogin } from './pages/verifiable-credentials/biconomy/biconomyLogin';
+// import { BiconomyLogin } from './pages/verifiable-credentials/biconomy/biconomyLogin';
 
 export function Router(): JSX.Element {
   return (
@@ -43,7 +43,7 @@ export function Router(): JSX.Element {
       <Route path="Observation/:observationId" element={<ObservationPage />} />
       <Route path="vc-main/*" element={<VcMainPage />}>
         <Route index element={<Navigate replace to="/vc-main/vc-items" />} />
-        <Route path="vc-items/login" element={<BiconomyLogin />} />
+        {/* <Route path="vc-items/login" element={<BiconomyLogin />} /> */}
         <Route path="vc-items" element={<VcItems />} />
         <Route path="vc-items/:itemId" element={<VcItem />} />
         <Route path="vp-items" element={<VpItems />} />

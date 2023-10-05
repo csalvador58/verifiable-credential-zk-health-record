@@ -80,9 +80,10 @@ app.post('/generate-cid', async (req: Request, res: Response, next: NextFunction
     res.status(400).send({ message: 'No DID provided' });
   }
 
-  const DIDkey = req.body.did;
+  const DIDkey = req.body.did as string;
+  console.log('DIDkey from ony api', DIDkey);
   const description =
-    'Token presents proof of DID creation by HMS Verifiable Credentials. The token is non-transferable and is not redeemable for monetary or fiat currency.';
+    'Receipt for Verifiable Credentials linked to DID:key. Non-transferable, non-redeemable for fiat.';
   const external_url = 'https://w3c-ccg.github.io/did-method-key/';
   const imageCID = 'ipfs://QmYNR56MRPf2Vc1NBuSSG95Bf4sTNarkfFhQGc7tC4qCk7';
 

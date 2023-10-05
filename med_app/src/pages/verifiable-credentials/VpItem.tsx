@@ -1,22 +1,34 @@
 import { Box, Stack, Text, Title, useMantineTheme, Divider, Accordion, Group, Button } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { InfoSection } from '../../components/InfoSection';
-import verfiablePresentation from './vc_store/medicationRequest_vp.json';
-import { ONYX_API } from '../../config';
+import verifiablePresentation from './vc_store/medicationRequest_vp.json';
 import { ToastContainer, toast } from 'react-toastify';
-import { MintSoulboundNft } from './biconomy/biconomyMint';
 import { Magic, RPCError, RPCErrorCode } from 'magic-sdk';
 import { useMedplum } from '@medplum/react';
-import { MAGIC } from '../../utils/constants';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { ethers } from 'ethers';
+import { DEFAULT_ECDSA_OWNERSHIP_MODULE, ECDSAOwnershipValidationModule } from '@biconomy/modules';
+import { BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from '@biconomy/account';
+import { ChainId } from '@biconomy/core-types';
+import { BUNDLER, MAGIC, PAYMASTER } from '../../utils/constants';
+import {
+  IHybridPaymaster,
+  SponsorUserOperationDto,
+  PaymasterMode,
+  IPaymaster,
+  BiconomyPaymaster,
+} from '@biconomy/paymaster';
+import { SOULBOUND_NFT_CONTRACT_ADDRESS, DEPLOYER_PK, ONYX_API } from '../../config';
+import abi from './biconomy/soulboundNftAbi.json';
 
 export function VpItem(): JSX.Element {
   const [magicIsActive, setMagicIsActive] = useState<boolean>(false);
+  const [isMinting, setIsMinting] = useState<boolean>(false);
   const theme = useMantineTheme();
   const { itemId } = useParams();
   const medplum = useMedplum();
 
-  const resource = verfiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
+  const resource = verifiablePresentation.find((verifiablePresentation: any) => verifiablePresentation.id === itemId)!;
 
   useEffect(() => {
     const checkLoggedIn = async () => {
@@ -28,9 +40,57 @@ export function VpItem(): JSX.Element {
         console.error('Error checking Magic logged-in state:', error);
       }
     };
-
     checkLoggedIn();
+
+    return () => {
+      // Logout of Magic when user leaves page
+      console.log('Logging out of Magic.');
+      const logout = async () => await MAGIC.user.logout();
+      logout();
+      setMagicIsActive(false);
+    };
   }, []);
+
+  const signInWithMagicOTP = async () => {
+    console.log(medplum.getActiveLogin());
+
+    console.log(medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value);
+
+    try {
+      // Get email from medplum login profile and sign in with Magic
+      // const email = medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value;
+      const email = '';
+      if (!!email) {
+        console.log('Logging in Magic with email: ', email);
+        const response = await MAGIC.auth.loginWithEmailOTP({ email: email });
+        console.log('response: ', response);
+      } else {
+        const response = await MAGIC.wallet.connectWithUI();
+        console.log('response: ', response);
+      }
+      setMagicIsActive(true);
+    } catch (err) {
+      if (err instanceof RPCError) {
+        switch (err.code) {
+          case RPCErrorCode.MagicLinkFailedVerification:
+            console.log('Magic link failed');
+            break;
+          case RPCErrorCode.MagicLinkExpired:
+            console.log('Magic link timeout');
+            break;
+          case RPCErrorCode.InternalError:
+            console.log('Magic link cancelled');
+            break;
+          case RPCErrorCode.InvalidRequest:
+            console.log('Magic link invalid email');
+            break;
+          case RPCErrorCode.MagicLinkRateLimited:
+            console.log('Magic link rate limited');
+            break;
+        }
+      }
+    }
+  };
 
   // On fetch completion, the holder's signed verifiable presentation will be saved in
   //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json simulating the Issuers DB
@@ -55,8 +115,8 @@ export function VpItem(): JSX.Element {
             error: 'Error requesting VP.',
           },
           {
-            position: 'top-center',
-            autoClose: 2500,
+            position: 'top-right',
+            autoClose: 2000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -78,56 +138,42 @@ export function VpItem(): JSX.Element {
 
       console.log('data: ', data.message);
 
+      const cid = data.message;
+      const did = resource.id;
       try {
         // Mint NFT with DID and CID
+        toast.info('Preparing to Mint NFT', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+        console.log('cid, did');
+        console.log(cid, did);
+        await handleMintRequest({ cid });
       } catch (error) {}
     } catch (error) {
+      toast.error('Error processing request', {
+        position: 'top-right',
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
       console.error(error);
     }
   };
 
-  const signInWithMagicOTP = async () => {
-    console.log(medplum.getActiveLogin());
-
-    console.log(medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value);
-
-    try {
-      // Get email from medplum login profile and sign in with Magic
-      const email = medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value;
-      if (!!email) {
-        console.log('Logging in Magic with email: ', email);
-        const response = await MAGIC.auth.loginWithEmailOTP({ email: email });
-        console.log('response: ', response);
-      } else {
-        const response = await MAGIC.wallet.connectWithUI();
-        console.log('response: ', response);
-      }
-    } catch (err) {
-      if (err instanceof RPCError) {
-        switch (err.code) {
-          case RPCErrorCode.MagicLinkFailedVerification:
-            console.log('Magic link failed');
-            break;
-          case RPCErrorCode.MagicLinkExpired:
-            console.log('Magic link timeout');
-            break;
-          case RPCErrorCode.InternalError:
-            console.log('Magic link cancelled');
-            break;
-          case RPCErrorCode.InvalidRequest:
-            console.log('Magic link invalid email');
-            break;
-          case RPCErrorCode.MagicLinkRateLimited:
-            console.log('Magic link rate limited');
-            break;
-        }
-      }
-    }
+  const checkLoginStatus = async () => {
+    console.log(await MAGIC.user.isLoggedIn());
   };
-
-  // const checkLoginStatus = async () => {
-  //   console.log(await MAGIC.user.isLoggedIn());
-  // }
   // const logout = async () => {
   //   console.log(await MAGIC.user.logout())
   // }
@@ -137,9 +183,11 @@ export function VpItem(): JSX.Element {
       <Title mb="lg">Verifiable Proof Details</Title>
       <InfoSection title={'ID: ' + resource.id}>
         <Stack spacing={0}>
-          <Button onClick={async () => await signInWithMagicOTP()}>Click here to complete Magic Authorization and generate a Verifiable Proof</Button>
-          {/* <Button onClick={async () => await checkLoginStatus()}>Check Login Status</Button> */}
-          {/* {magicIsActive && <Button onClick={async () => await logout()}>Logout</Button>} */}
+          {!magicIsActive && (
+            <Button onClick={async () => await signInWithMagicOTP()}>
+              Click here to complete Magic Authorization and generate a Verifiable Proof
+            </Button>
+          )}
           {magicIsActive && (
             <Button onClick={async () => await handleVPRequest()}>
               Click here to claim a proof of your Verifiable Credential
@@ -150,7 +198,8 @@ export function VpItem(): JSX.Element {
           <Divider />
           <AccordionDisplay DID_VC={resource.id} VerifiableCredential={resource.vp_signed} />
           <Divider />
-          {/* <MintSoulboundNft /> */}
+          <Button onClick={async () => await checkLoginStatus()}>Check Login Status</Button>
+          {/* {magicIsActive && <Button onClick={async () => await logout()}>Logout</Button>} */}
           <ToastContainer />
         </Stack>
       </InfoSection>
@@ -201,3 +250,175 @@ function AccordionLabel({ DID_VC }: AccordionProps): JSX.Element {
     </Group>
   );
 }
+
+interface MintRequest {
+  cid: string;
+}
+
+const handleMintRequest = async ({ cid }: MintRequest) => {
+  toast('Minting NFT now in progress', {
+    position: 'top-right',
+    autoClose: false,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    progress: undefined,
+    theme: 'light',
+  });
+  // console.log('Logging in with Magic...');
+  // // Magic login
+  // toast.info('Please log into Magic to continue...', {
+  //   position: 'top-right',
+  //   autoClose: 2500,
+  //   hideProgressBar: false,
+  //   closeOnClick: true,
+  //   pauseOnHover: false,
+  //   draggable: false,
+  //   progress: undefined,
+  //   theme: 'light',
+  // });
+  // await MAGIC.wallet.connectWithUI();
+
+  // Setup biconomy smart account
+  const web3Provider = new ethers.providers.Web3Provider(MAGIC.rpcProvider as any);
+  const module = await ECDSAOwnershipValidationModule.create({
+    signer: web3Provider.getSigner(),
+    moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
+  });
+
+  let biconomySmartAccount = await BiconomySmartAccountV2.create({
+    chainId: ChainId.POLYGON_MUMBAI,
+    bundler: BUNDLER,
+    paymaster: PAYMASTER,
+    entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+    defaultValidationModule: module,
+    activeValidationModule: module,
+  });
+
+  console.log('Minting NFT...');
+  try {
+    const to = await biconomySmartAccount.getAccountAddress();
+    console.log('**** Smart Account Address: ', to);
+    console.log(
+      'deployed: ',
+      await biconomySmartAccount.isAccountDeployed(await biconomySmartAccount.getAccountAddress())
+    );
+    const tokenId = Math.floor(Math.random() * 10_000_000);
+    const uri = cid;
+
+    try {
+      const { partialUserOp, BiconomyPaymaster, paymasterServiceData } = await setupMintUserOp({
+        to,
+        tokenId,
+        uri,
+        biconomySmartAccount,
+        web3Provider,
+      });
+
+      const userOpResponse = await processPaymaster({
+        partialUserOp,
+        biconomySmartAccount,
+        BiconomyPaymaster,
+        paymasterServiceData,
+      });
+
+      toast.success(`Transaction Hash: ${userOpResponse.userOpHash}`, {
+        position: 'top-right',
+        autoClose: 10000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      toast.warn(
+        'Please allow 5-10 minutes before submitting another Mint request. Request will likely fail if executed before this time',
+        {
+          position: 'top-right',
+          autoClose: false,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        }
+      );
+
+      // getCount(true);
+    } catch (error) {
+      console.error('Error executing transaction:', error);
+      // ... handle the error if needed ...
+    }
+  } catch (error) {
+    console.error('Error executing transaction:', error);
+    toast.error('Error occurred, check the console', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'dark',
+    });
+  }
+};
+
+interface MintUserOp {
+  to: string;
+  tokenId: number;
+  uri: string;
+  biconomySmartAccount: BiconomySmartAccountV2;
+  web3Provider: ethers.providers.Web3Provider;
+}
+
+const setupMintUserOp = async ({ to, tokenId, uri, biconomySmartAccount, web3Provider }: MintUserOp) => {
+  const deployer = new ethers.Wallet(DEPLOYER_PK, web3Provider);
+  const contract = new ethers.Contract(SOULBOUND_NFT_CONTRACT_ADDRESS, abi, web3Provider);
+  let transferCallData = contract.connect(deployer).interface.encodeFunctionData('safeMint', [to, tokenId, uri]);
+
+  console.log('**** MINT_NFT_CONTRACT_ADDRESS: ');
+  console.log(SOULBOUND_NFT_CONTRACT_ADDRESS);
+  const tx1 = {
+    to: SOULBOUND_NFT_CONTRACT_ADDRESS,
+    data: transferCallData,
+  };
+
+  const partialUserOp = await biconomySmartAccount.buildUserOp([tx1]);
+  const BiconomyPaymaster = biconomySmartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+
+  let paymasterServiceData: SponsorUserOperationDto = {
+    mode: PaymasterMode.SPONSORED,
+    smartAccountInfo: {
+      name: 'BICONOMY',
+      version: '2.0.0',
+    },
+    // optional params...
+  };
+
+  return { partialUserOp, BiconomyPaymaster, paymasterServiceData };
+};
+
+const processPaymaster = async ({
+  partialUserOp,
+  biconomySmartAccount,
+  BiconomyPaymaster,
+  paymasterServiceData,
+}: any) => {
+  const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
+  partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
+
+  console.log('**** partialUserOp.paymasterAndData: ');
+  console.log(partialUserOp.paymasterAndData);
+
+  const userOpResponse = await biconomySmartAccount.sendUserOp(partialUserOp);
+  const transactionDetails = await userOpResponse.wait();
+
+  console.log('Transaction Details:', transactionDetails);
+  console.log('Transaction Hash:', userOpResponse.userOpHash);
+
+  return userOpResponse;
+};
