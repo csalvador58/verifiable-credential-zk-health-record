@@ -11,6 +11,7 @@ export function VcMainPage(): JSX.Element {
     menu: [
       { name: 'Create Verifiable Credentials', href: '/vc-main/vc-items' },
       { name: 'View/Share Proof of Credentials', href: '/vc-main/vp-items' },
+      { name: '**Demo Only** - Verifiers', href: '/vc-main/verify-items' },
     ],
   };
 

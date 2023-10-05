@@ -22,6 +22,8 @@ import { HomePage } from './pages/HomePage';
 import { Messages } from './pages/MessagesPage';
 import { ObservationPage } from './pages/ObservationPage';
 import { SignOutPage } from './pages/SignOutPage';
+import { VerifyItem } from './pages/verifiable-credentials/VerifyItem';
+import { VerifyItems } from './pages/verifiable-credentials/VerifyItems';
 // import { BiconomyLogin } from './pages/verifiable-credentials/biconomy/biconomyLogin';
 
 export function Router(): JSX.Element {
@@ -48,6 +50,8 @@ export function Router(): JSX.Element {
         <Route path="vc-items/:itemId" element={<VcItem />} />
         <Route path="vp-items" element={<VpItems />} />
         <Route path="vp-items/:itemId" element={<VpItem />} />
+        <Route path="verify-items" element={<VerifyItems />} />
+        <Route path="verify-items/:itemId" element={<VerifyItem />} />
       </Route>
       <Route path="get-care/*" element={<GetCare />} />
       <Route path="account/*" element={<AccountPage />}>
