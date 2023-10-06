@@ -1,6 +1,7 @@
 pub mod patient;
 pub mod vc;
 pub mod medication_request;
+pub mod image;
 
 pub use patient::Patient;
 pub use vc::VerifiableCredential;
@@ -15,4 +16,5 @@ pub use medication_request::Subject;
 pub use medication_request::Encounter;
 pub use medication_request::Requester;
 pub use medication_request::ReasonReference;
+pub use image::ImageId;
 

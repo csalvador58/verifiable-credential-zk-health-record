@@ -16,24 +16,26 @@ const didKey = new KeyDIDMethod();
 const didEthr = new EthrDIDMethod(ethrProvider);
 const jwtService = new JWTService();
 
-const verification = async () => {
+export const verification = async (verifiablePresentationToken: string) => {
   // Instantiating the didResolver
   const didResolver = getSupportedResolvers([didKey, didEthr]);
+  // const didResolver = getSupportedResolvers([didKey]);
+  console.log("didResolver", didResolver)
 
-  if (VP) {
+  if (verifiablePresentationToken) {
     try {
       console.log("\nReading an existing signed VP JWT\n");
-      const signedVpJwt = fs.readFileSync(
-        path.resolve(VP_DIR_PATH, `${camelCase(VP)}.jwt`),
-        "utf8"
-      );
-      console.log(signedVpJwt);
+      // const signedVpJwt = fs.readFileSync(
+      //   path.resolve(VP_DIR_PATH, `${camelCase(VP)}.jwt`),
+      //   "utf8"
+      // );
+      console.log(verifiablePresentationToken);
 
       console.log("\nVerifying VP JWT\n");
       // Inovking the verification fuction from the sdk
       // To know more about verification and api reference please refer to readme in src > verifier > readme.md in the sdk
       const isVpJwtValid = await verifyPresentationJWT(
-        signedVpJwt,
+        verifiablePresentationToken,
         didResolver
       );
 
@@ -42,13 +44,16 @@ const verification = async () => {
 
         console.log("\nGetting VC JWT from VP\n");
 
-        const vcJwt = getCredentialsFromVP(signedVpJwt)[0];
+        const vcJwt = getCredentialsFromVP(verifiablePresentationToken)[0];
+        console.log('vcJwt');
+        console.log(vcJwt);
 
         try {
           console.log("\nVerifying VC\n");
 
           const vcVerified = await verifyDIDs(vcJwt, didResolver);
           console.log(`\nVerification status: ${vcVerified}\n`);
+          return { status: vcVerified, vc: vcJwt};
         } catch (error) {
           console.log(error);
         }
@@ -72,5 +77,3 @@ const verification = async () => {
     console.log("\nPlease refer to issuer scripts to generate and sign a VP\n");
   }
 };
-
-verification();

@@ -3,6 +3,8 @@ import { createVc } from '../issuer/create-and-sign-vc_with_schema_params';
 import { createAndSignVp } from '../holder/create-and-sign-vp';
 import cors from 'cors';
 import { uploadMetadata } from './uploadMetadata';
+import { verification } from '../verifier/verify';
+import { decodeJWT } from 'did-jwt';
 
 const app: Express = express();
 app.use(express.json());
@@ -93,6 +95,71 @@ app.post('/generate-cid', async (req: Request, res: Response, next: NextFunction
     res.send({ message: metadataCID });
   } catch (error) {
     console.log(error);
+  }
+});
+
+interface IVerifyRequest extends Request {
+  body: {
+    vp: string;
+  };
+}
+
+app.post('/verify', async (req: IVerifyRequest, res: Response) => {
+  try {
+    if (!req.body.vp) {
+      return res.status(400).send({ message: 'No Verifiable Presentation provided to verify' });
+    }
+    console.log('req.body.vp', req.body.vp);
+
+    const result = await verification(req.body.vp);
+    if (result) {
+      return res.status(200).send({ message: result });
+    } else {
+      return res.status(400).send({ message: result });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
+app.post('/verify-zkp', async (req: Request, res: Response) => {
+  try {
+    if (!req.body.vc) {
+      return res.status(400).send({ message: 'No ZK Proof provided to verify' });
+    }
+    const { vc } = req.body;
+    console.log('vc', vc);
+
+    const decodedVc = await decodeJWT(vc as string);
+    console.log('decodedVc', decodedVc);
+    console.log('cred sub', decodedVc.payload.vc.credentialSubject);
+
+    const imageID: number[] = decodedVc.payload.vc.credentialSubject.image_id;
+    console.log({ image: imageID });
+
+    const url = `http://127.0.0.1:8080/zkp/verify`;
+    const method = 'POST';
+    const zkReceipt = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ image: imageID }), 
+    }).then(async (response) => {
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const zkProof = await response.json();
+
+      console.log('zkProof', zkProof);
+
+      res.send({ message: zkProof });
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: 'Internal server error' });
   }
 });
 
