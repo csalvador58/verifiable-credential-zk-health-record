@@ -21,7 +21,7 @@ export const uploadMetadata = async ({ DIDkey, description, external_url, imageC
           did: DIDkey,
           date: new Date().toLocaleString(),
         },
-        name: `HMS credential`,
+        name: `Verifiable Credential ZK Health Record`,
       },
     });
 
