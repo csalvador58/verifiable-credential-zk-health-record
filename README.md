@@ -16,7 +16,7 @@ VC ZK Health Record (VC-ZK HR) project was built during a [Digital Identity Hack
 
 ![User Flow Diagram](media/flow.png)
 
-### - [Healthcare Provider] 
+### - [Healthcare Provider](#hp-section)
 - Sends FHIR EHR to zkEVM to generate a [Receipt](https://dev.risczero.com/zkvm/developer-guide/receipts). The full receipt is written to a file, [zkp_receipt.json](zk_app/zkp_receipt.json), in the [zk app](zk_app) to be used during the proof verification. Details of the verification will be found in the <a name="verifier-section">Verifier section</a>.
     - Receipt contains a [journal](https://dev.risczero.com/terminology#journal) containing the public outputs of the zkVM application and a [seal, or the zk-STARK,](https://dev.risczero.com/terminology#seal) that attests the correct execution of the proven statement ***(aka [guest program](https://dev.risczero.com/terminology#guest-program))***.
     - An [ImageID](https://dev.risczero.com/terminology#image-id) is included in the public outputs for use in the a verification process.
@@ -26,7 +26,7 @@ VC ZK Health Record (VC-ZK HR) project was built during a [Digital Identity Hack
     - Signed VC is written to file, [`medicationRequest_vc.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json), simply simulating DB store at the issuer. 
 - Sequence Ends, Patient has access to view the VC.
 
-### - [Patient]
+### - [Patient](#patient-section)
 - Fulfils Identity Authorization to request for a VP. The Identity Authorization requires signing into a [Magic link](https://magic.link/docs/home/welcome).
 - Onyx SDK executes [`create-and-sign-vp.ts`](med_app/packages/onyx-ssi-sdk/src/holder/create-and-sign-vp.ts) to produce the verifiable presentation (VP) issued by the patient.
  - Signed VP is written to file, [`medicationRequest_vp.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json), simply simulating DB store at the issuer. 
