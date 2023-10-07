@@ -16,8 +16,8 @@ VC ZK Health Record (VC-ZK HR) project was built during a [Digital Identity Hack
 
 ![User Flow Diagram](media/flow.png)
 
-#### - [Healthcare Provider] 
-- Sends FHIR EHR to zkEVM to generate a [Receipt](https://dev.risczero.com/zkvm/developer-guide/receipts)
+### - [Healthcare Provider] 
+- Sends FHIR EHR to zkEVM to generate a [Receipt](https://dev.risczero.com/zkvm/developer-guide/receipts). The full receipt is written to a file, [zkp_receipt.json](zk_app/zkp_receipt.json), in the [zk app](zk_app) to be used during the proof verification. Details of the verification will be found in the <a name="verifier-section">Verifier section</a>.
     - Receipt contains a [journal](https://dev.risczero.com/terminology#journal) containing the public outputs of the zkVM application and a [seal, or the zk-STARK,](https://dev.risczero.com/terminology#seal) that attests the correct execution of the proven statement ***(aka [guest program](https://dev.risczero.com/terminology#guest-program))***.
     - An [ImageID](https://dev.risczero.com/terminology#image-id) is included in the public outputs for use in the a verification process.
 - Onyx SDK executes [`create-and-sign-vc_with_schema_params.ts`](med_app/packages/onyx-ssi-sdk/src/issuer/create-and-sign-vc_with_schema_params.ts) to produce the verifiable credential (VC) issued by the Healthcare Provider. In details, the following occurs:
@@ -34,7 +34,15 @@ VC ZK Health Record (VC-ZK HR) project was built during a [Digital Identity Hack
     - The `DID:Key` representing the Issuers signed VC is added to a metadata object and uploaded to [IPFS](https://docs.ipfs.tech/) via [Pinata](https://docs.pinata.cloud/docs) to obtain a [CID](https://docs.pinata.cloud/docs/cids) for use during the minting of the NFT Receipt token.
     - [Biconomy's Sponsored Paymaster Service](https://docs.biconomy.io/docs/Biconomy%20AA%20Stack/Paymaster/description) creates a gasless experience for the patient. The patient's Magic link sign-in is a requirement in order for the process to run.
     - The [SoulBound NFT Contract](registry/src/SoulBoundRecord.sol) address: `0xa543cf2937b0b00b62f325b3b778517be3d7cebc` was previously setup and deployed on the [testnet](https://mumbai.polygonscan.com/address/0xa543cf2937b0b00b62f325b3b778517be3d7cebc). The patient's smart account address was also granted a MINTER_ROLE for the project demo. [Remix](https://remix.ethereum.org/) was utilized to setup the NFT contract for the project's demo. No UI has been created for granting/revoking of roles or NFT token burn at the completion of this hackathon project.
-- Patient is able to view the signed VP and share with a verify.
+- Sequence Ends, Patient has access to the signed VP and share with a verify.
+
+
+### - [Verifier](#verifier-section)
+- The demo project displays a Verifier section to simulate the verification procedures. Running the `Verify Signed JWT` is needed before running the `Verify Zero Knowledge Proof` in the application to reveal the payload of a decoded VP, resulting with the signed VC.
+- Onyx SDK executes [`verify.ts`](med_app/packages/onyx-ssi-sdk/src/verifier/verify.ts) confirming a valid signed VP/VC JWT token.
+- During the zk proof verification, the payload of the signed VC token is decoded to retain the [ImageID](https://dev.risczero.com/terminology#image-id). The image is sent to the [zkVM API](zk_app/api/src/main.rs) to execute the `receipt.verify(ImageID)` method for proof verification. 
+
+
 
 ### About the Dev
 
