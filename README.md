@@ -167,11 +167,15 @@ cargo run --release
 Open in browser, [localhost:3000](http://localhost:3000), enjoy!
 
 ---
-### MISC: From Design Thinking Onyx Hackathon Workshop
-
-![Opportunity Canvas](media/opp_canvas.png)
-![Story Map](media/story.png)
+### Known Issues
+- Encountered random userOp issues during the Biconomy Paymaster setup preventing the NFT Mint to fail. RPC was updated to Alchemy to try and remedy. If issue occurs, just try again after a few minutes and it seemed to work for me. 
 
 ---
-### [About the Dev](https://linktr.ee/chrissalvador)
+### Other Misc: From Design Thinking Onyx Hackathon Workshop
+
+</br>![Opportunity Canvas](media/opp_canvas.png)
+</br>![Story Map](media/story.png)
+
+---
+### [About the Dev](https://linktr.ee/chrissalvador) <--
 ---
