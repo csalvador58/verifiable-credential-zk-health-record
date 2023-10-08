@@ -36,8 +36,9 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
     - The [VC SoulBound Receipt Contract](registry/src/VCSoulBoundReceipt.sol) address: `0x50F49A3B09BD7597ff588686843d9b03070EdCbe` was previously setup and deployed on the [testnet](https://mumbai.polygonscan.com/address/0x50F49A3B09BD7597ff588686843d9b03070EdCbe). The patient's smart account address was also granted a MINTER_ROLE for the project demo. [Remix](https://remix.ethereum.org/) was utilized to setup the NFT contract for the project's demo. No UI has been created for granting/revoking of roles or NFT token burn at the completion of this hackathon project.
 - Sequence Ends, Patient has access to the signed VP and able to share with a verifier.
 
+<a name="verifier-section"></a> 
 
-### - <a name="verifier-section"></a> [Verifier]
+### - [Verifier] 
 - The application displays a Verifier section to simulate the verification procedures. Running the `Verify Signed JWT` is needed before running the `Verify Zero Knowledge Proof` in the application to reveal the payload of a decoded VP, resulting with the signed VC.
 - [Onyx SDK API](med_app/packages/onyx-ssi-sdk) executes [`verify.ts`](med_app/packages/onyx-ssi-sdk/src/verifier/verify.ts) confirming a valid signed VP/VC JWT token.
 - During the zk proof verification, the payload of the signed VC token is decoded to retain the [ImageID](https://dev.risczero.com/terminology#image-id). The ImageID is sent to the [zkVM API](zk_app/api/src/main.rs) to execute the `receipt.verify(ImageID)` method for proof verification. The receipt itself is read from the file, [zkp_receipt.json](zk_app/zkp_receipt.json), simulating a possible zk receipt registry. In this project, the file will only contain the last generated zk proof.
