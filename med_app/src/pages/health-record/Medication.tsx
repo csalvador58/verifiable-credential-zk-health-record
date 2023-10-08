@@ -65,7 +65,7 @@ function VcModal({
 
     try {
       const healthRecord = { ...prev };
-      console.log(healthRecord);
+      // console.log(healthRecord);
       const url = `${ONYX_API}/create-signed-vc`;
       const method = 'POST';
 

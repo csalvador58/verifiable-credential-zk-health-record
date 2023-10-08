@@ -22,7 +22,7 @@ export function VcItem(): JSX.Element {
   // On fetch completion, an issuer signed vc with zkp will be saved in
   //  ~/med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json simulating the Issuers DB
   const handleVCRequest = async () => {
-    console.log(resource);
+    // console.log(resource);
 
     try {
       const signedVCJwt = resource?.vc_signed;

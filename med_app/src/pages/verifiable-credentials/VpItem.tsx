@@ -65,12 +65,12 @@ export function VpItem(): JSX.Element {
       // const email = medplum.getProfile()?.telecom?.find((t) => t.system === 'email')?.value;
       const email = ''; // Set to empty string to force Magic to show UI
       if (!!email) {
-        console.log('Logging in Magic with email: ', email);
+        // console.log('Logging in Magic with email: ', email);
         const response = await MAGIC.auth.loginWithEmailOTP({ email: email });
-        console.log('response: ', response);
+        // console.log('response: ', response);
       } else {
         const response = await MAGIC.wallet.connectWithUI();
-        console.log('response: ', response);
+        // console.log('response: ', response);
       }
       setMagicIsActive(true);
     } catch (err) {
@@ -396,14 +396,14 @@ const processPaymaster = async ({
     const paymasterAndDataResponse = await BiconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
     partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-    console.log('**** partialUserOp.paymasterAndData: ');
-    console.log(partialUserOp.paymasterAndData);
+    // console.log('**** partialUserOp.paymasterAndData: ');
+    // console.log(partialUserOp.paymasterAndData);
 
     const userOpResponse = await biconomySmartAccount.sendUserOp(partialUserOp);
     const transactionDetails = await userOpResponse.wait();
 
     console.log('Transaction Details:', transactionDetails);
-    console.log('Transaction Hash:', userOpResponse.userOpHash);
+    // console.log('Transaction Hash:', userOpResponse.userOpHash);
 
     return userOpResponse;
   } catch (error) {
