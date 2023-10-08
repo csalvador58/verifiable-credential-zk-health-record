@@ -29,7 +29,7 @@ export function Footer(): JSX.Element {
             </SimpleGrid>
             <Divider />
             <Text color="dimmed" size="sm">
-              &copy; {new Date().getFullYear()} Health Management System, Inc. A healthcare project by Chris Salvador. All rights reserved.
+              &copy; {new Date().getFullYear()} Verifiable Credential ZK Health Records, Inc. A healthcare project by Chris Salvador. All rights reserved.
             </Text>
           </Stack>
         </Container>

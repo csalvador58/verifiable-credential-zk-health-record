@@ -1,5 +1,5 @@
 import { Box, useMantineTheme } from '@mantine/core';
-import logo from '../img/logo/Health Management System.svg';
+import logo from '../img/logo/vc-zk-hr-main-header.svg';
 
 export interface LogoProps {
   width: number;

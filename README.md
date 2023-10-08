@@ -47,6 +47,60 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - Additionally, a verifier can manually verify the patient's smart account for the NFT Receipt to match the `DID:Key` related to a verifiable credential. 
 - Sequence Ends, zk proof verified.
 
+## Components
+
+### [Frontend](med_app/src)
+- A free and open-source sample [healthcare webapp by the Medplum Team](https://github.com/medplum/foomedical) was used for this project to bootstrap the secure and compliant backend as well as learning and applying the [FHIR](https://www.hl7.org/fhir/) standards to create a more realistic Healthcare project. 
+- The following UI components are the focus of this project:
+    - [`medication.tsx`](med_app/src/pages/health-record/Medication.tsx)
+    - [`VerifyItem.tsx`](med_app/src/pages/verifiable-credentials/VcItem.tsx)
+
+### Demo Walkthrough
+
+[Patient] </br>
+1. Click `Log in` button on the top-right of screen: 
+</br>![Login](/media/login.png)
+2. Login with the sample profile to ensure sample data are loaded: username: **`salvador.web3.patient@gmail.com`** and password: **`encode_onyx`** 
+3. Click on `Health Record`
+</br>![Health Record](media/health_record.png)
+4. Click `Medication` on left sidebar
+</br>![Medication](media/medication.png)
+5. Click on one of the 2 sample Medication Request records
+6. Click `Request VC` to generate a signed verifiable credential with zk proof
+</br>![Request a VC](media/request_a_vc.png)
+7. A modal will appear, click `Submit VC Request`
+</br>![Submit VC Request](media/submit_vc_request.png)
+8. After issued VC is created, a link will appear. Click on link to navigate to the VC section and view the available VCs
+</br>![navigate to vc](media/navigate_to_vc.png)
+9. Click on an available VC to view the details page
+10. A chevron icon is available to display the VC token string. Copy and paste into the `Encoded` section of this [JWT site](https://jwt.io/) to decode and view the payload
+11. Click button to sign the issued VC and create a VP
+</br>![sign vc](media/holder_sign_vc.png)
+12. Click `View/Share Proof of Credentials` in the sidebar section
+</br>![view VP](media/view_vp.png)
+12. Clink on an available VP
+13. A chevron icon is available to display the VP token string. Copy and paste into the `Encoded` section of this [JWT site](https://jwt.io/) to decode and view the payload
+14. Click button to login via Magic link
+</br>![auth login](media/auth_login.png)
+15. Login with an email. 
+</br>![Magic link](media/magic_link.png)
+16. Click on submit button to generate a NFT Receipt and send to your smart account.
+</br>***In order to get beyond this point, you need to Sign-up for your own account on Medplum and load in the [sample data](https://www.medplum.com/docs/tutorials/importing-sample-data) from the [Medplum tutorials](https://www.medplum.com/docs/tutorials). In the Medplum.app, locate a medication request record and view the raw JSON. Copy and create a new medication request record and apply the Patient ID that is assigned to your Medplum account. Then deploy your own NFT SoulBound contract, verify it on Polygon's testnet, setup a Biconomy Paymaster and create a policy for the NFT contract, and grant the necessary MINTER_ROLE to the Smart Account that gets generated during the Biconomy/Magic login. Feel free to reach out to me if you have questions.***
+17. After NFT mint is complete, a link will display.
+</br>![OpenSea testnetlink](media/opensea.png)
+18. Clink link to see on [OpenSea Testnets](https://testnets.opensea.io/assets/mumbai/0xa543cf2937b0b00b62f325b3b778517be3d7cebc/2282856)
+19. Clink on the TokenID in the Details section to view the [metadata](https://ipfs.io/ipfs/QmQXqk5wKN4MiyzqBUJTXA8ZcH1hXakDfcRe9fjWAfH69a)
+
+</br>
+
+[Verifier]
+
+1. Click on `**Demo Only** - Verifiers` in the sidebar of the `Verifiable Credentials` section
+</br>![verifiers only](media/verifier_only.png)
+2. Click on each `Verify` button to perform describe verification. Chevron icons are available to view the JWT strings
+</br>![zk verification](media/zk_verify.png)
+
+![Alt text](image.png)
 
 ### About the Dev
 

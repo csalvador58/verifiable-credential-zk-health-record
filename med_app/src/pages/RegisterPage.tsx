@@ -15,7 +15,7 @@ export function RegisterPage(): JSX.Element {
           recaptchaSiteKey={MEDPLUM_RECAPTCHA_SITE_KEY}
           onSuccess={() => navigate('/')}
         >
-          <h2>Register with HMS</h2>
+          <h2>Register with Verifiable Credential ZK Health Records</h2>
         </RegisterForm>
       </Box>
       {/* <BackgroundImage src="https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1567&amp;q=80" /> */}

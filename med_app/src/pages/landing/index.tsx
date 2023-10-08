@@ -150,7 +150,7 @@ const features = [
   {
     title: 'Generate VCs on demand',
     description:
-      'Use standard templates generate a VC based on your personal health records.',
+      'Uses FHIR base standards to generate a Verifiable Credential of your personal health records.',
   },
   {
     title: 'Create Verifiable Presentations',
@@ -160,7 +160,7 @@ const features = [
   {
     title: 'Zero Knowledge',
     description:
-      'Verify with privacy intact.',
+      `Providing a new future focused on true privacy.`,
   },
 ];
 
@@ -180,14 +180,14 @@ export function LandingPage(): JSX.Element {
               <span className={classes.highlight}>Health Credentials</span>
             </Title>
             <Text size="lg" color="dimmed" mt="md">
-              Create verifiable presentations of your health records and send to verifiers as proofs.
+              New focus on privacy. Create verifiable presentations of your health records and share only want you need to.
             </Text>
             <Group mt={30}>
               <Button radius="xl" size="md" className={classes.control}>
                 Get started
               </Button>
               <Button variant="default" radius="xl" size="md" className={classes.control}>
-                Source code
+                Need Help?
               </Button>
             </Group>
           </div>

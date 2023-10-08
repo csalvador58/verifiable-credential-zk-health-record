@@ -105,7 +105,7 @@ const useStyles = createStyles((theme) => ({
 const carouselItems = [
   {
     img: <IconChecklist />,
-    title: 'Welcome to HMS',
+    title: 'Welcome to VC ZK HR',
     description:
       'Advanced healthcare platform to provide faster care when you need it most.',
     url: '/get-care',
@@ -169,7 +169,7 @@ const recommendations = [
   },
   {
     title: 'Request health record',
-    description: 'Get records sent to or from HMS.',
+    description: 'Get records sent to or from Verifiable Credential ZK Health Records.',
   },
 ];
 
@@ -184,7 +184,7 @@ export function HomePage(): JSX.Element {
     <>
       <Box className={classes.announcements}>
         <span>
-        Encode Club's Digital Identity Hackathon sponsored by Onyx by J.P. Morgan. <Anchor href="#">Health Management System Project Created By Chris Salvador.</Anchor>
+        Encode Club's Digital Identity Hackathon sponsored by Onyx by J.P. Morgan. <Anchor href="#">Verifiable Credential ZK Health Records Project Created By Chris Salvador.</Anchor>
         </span>
       </Box>
       <div className={classes.hero}>
@@ -259,7 +259,8 @@ export function HomePage(): JSX.Element {
                     <Text size="sm" color="dimmed" my="sm">
                       Having a consistent, trusted provider can lead to better health.
                     </Text>
-                    <Button onClick={() => navigate('/account/provider')}>Choose Provider</Button>
+                    {/* <Button onClick={() => navigate('/account/provider')}>Choose Provider</Button> */}
+                    <Button onClick={() => ('')}>Choose Provider</Button>
                   </div>
                 </Group>
               </Card>

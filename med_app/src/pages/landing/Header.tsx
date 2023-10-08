@@ -176,23 +176,21 @@ export function Header(): JSX.Element {
         <Container py={20}>
           <Group position="apart">
             <UnstyledButton className={classes.logoButton} onClick={() => navigate('/')}>
-              {/* <Logo width={240} />  */}
               <Logo width={500} height={50} leftMargin={-115}/>
-              {/* <Title className={classes.title}>Health Management System</Title> */}
             </UnstyledButton>
 
             <Group sx={{ height: '100%' }} spacing={0} className={classes.hiddenMobile}>
               <HoverCard width={600} position="bottom" radius="md" shadow="md" withinPortal>
-                <HoverCard.Target>
+                {/* <HoverCard.Target> */}
                   <a href="#" className={classes.link}>
                     <Center inline>
                       <Box component="span" mr={5}>
-                        Services
+                        About
                       </Box>
                       <IconChevronDown size={16} color={theme.fn.primaryColor()} />
                     </Center>
                   </a>
-                </HoverCard.Target>
+                {/* </HoverCard.Target> */}
 
                 <HoverCard.Dropdown sx={{ overflow: 'hidden' }}>
                   <Group position="apart" px="md">
@@ -238,7 +236,7 @@ export function Header(): JSX.Element {
               <Button variant="default" onClick={() => navigate('/signin')}>
                 Log in
               </Button>
-              <Button onClick={() => navigate('/register')}>Sign up</Button>
+              {/* <Button onClick={() => navigate('/register')}>Sign up</Button> */}
             </Group>
 
             <Burger opened={drawerOpened} onClick={toggleDrawer} className={classes.hiddenDesktop} />
@@ -283,7 +281,7 @@ export function Header(): JSX.Element {
             <Button variant="default" onClick={() => navigate('/signin')}>
               Log in
             </Button>
-            <Button onClick={() => navigate('/register')}>Sign up</Button>
+            {/* <Button onClick={() => navigate('/register')}>Sign up</Button> */}
           </Group>
         </ScrollArea>
       </Drawer>
