@@ -1,6 +1,6 @@
 # Verifiable Credential ZK Health Records
 
-VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hackathon](https://www.encode.club/digital-identity-hackathon) sponsored by [Onyx by J.P. Morgan](https://www.jpmorgan.com/onyx/index) and hosted by [Encode Club](https://www.encode.club/). This project showcases a real practical use of DIDs [(Decentralized IDs)](https://w3c-ccg.github.io/did-primer/), VCs [(Verifiable Credentials)](https://www.w3.org/TR/vc-data-model/), and ZKP [(Zero-Knowlegde Proofs)](https://zkhack.dev/whiteboard/) in the Healthcare Industry.
+VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hackathon](https://www.encode.club/digital-identity-hackathon) sponsored by [Onyx by J.P. Morgan](https://www.jpmorgan.com/onyx/index) and hosted by [Encode Club](https://www.encode.club/). This project showcases a real practical use of DIDs [(Decentralized IDs)](https://w3c-ccg.github.io/did-primer/), VCs [(Verifiable Credentials)](https://www.w3.org/TR/vc-data-model/), and ZKP [(Zero-Knowlegde Proofs)](https://zkhack.dev/whiteboard/) in the Healthcare Industry. A focused priority for this project is to demonstrate a process for the patient to not have to manage multiple private keys.
 
 ## Problems to Solve
 
@@ -24,7 +24,10 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - [Onyx SDK API](med_app/packages/onyx-ssi-sdk) executes [`create-and-sign-vc_with_schema_params.ts`](med_app/packages/onyx-ssi-sdk/src/issuer/create-and-sign-vc_with_schema_params.ts) to produce the [verifiable credential (VC)](https://www.w3.org/2018/credentials/) issued by the Healthcare Provider. In details, the following occurs:
     - An arbitrary expiration data *(1 year)* is added to the VC.
     - Schema validation performed on the FHIR EHR using the [<code>fhir.schema.json</code>](med_app/packages/onyx-ssi-sdk/src/issuer/schemas/fhir.schema.json) file. Accuracy of the file is not verified and was obtained from this [Asymmetrik FHIR API Server](https://github.com/bluehalo/node-fhir-server-core/tree/master/packages/fhir-json-schema-validator) project.
-    - Signed VC is written to file, [`medicationRequest_vc.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json), simply simulating DB store at the issuer. 
+    - Signed VC is written to file, [`medicationRequest_vc.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vc.json), simply simulating DB store at the issuer.
+    </br>
+    </br>
+    - ****Explanation of how DID keys are being managed:**** DID:Keys are read from an .env file as a focus for this project is to not have a patient tracking multiple private keys. It's expected that the private keys are managed by the health provider for both itself *(issuer)* and the patient *(holder)*. A trusted health provider will securely store electronic health records with the patient's private keys and ensure correct use of the DID:key upon issuing a VC. The soulbound NFT receipt will contain a DID:key that references to a signed VC and is sent to the patient's Smart Account during the creation of the VP. Any NFT receipt sent to the patient's smart account without being processed through the Biconomy paymaster can be viewed as untrusted. Since the patient needs to authorize the creation of a VP via the Magic link step in the flow of the program, an untrusted issuer will not be able to issue a malicious VC on the patient. A verifier will be able to verify the patient's NFT Receipt, the VP token, and zk proof for correctness in the trust triangle.
 - Sequence Ends, Patient has access to view the VC.
 
 ### - [Patient]
@@ -168,9 +171,16 @@ cargo run --release
 Open in browser, [localhost:3000](http://localhost:3000), enjoy!
 
 ---
+## Future Roadmap
+- Revise or replace zk proof system as needed pending revisions from zk protocols.
+- Add in all available FHIR resource types for increased compatibility and testing.
+- Build out messaging using a Web3 protocol.
+- Build or integrate medical billing feature targeting ICD-10-CM and/or Current Procedural Terminology (CPT).
+- Add/Revise DID methods.
+
+---
 ### Known Issues
 - Encountered random userOp issues during the Biconomy Paymaster setup preventing the NFT Mint to fail. RPC was updated to Alchemy to try and remedy. If issue occurs, just try again after a few minutes and it seemed to work for me. 
-
 ---
 ### Other Misc: From Design Thinking Onyx Hackathon Workshop
 
