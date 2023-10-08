@@ -30,7 +30,7 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - Fulfils Identity Authorization to request for a [verifiable presentation (VP)](https://w3c-ccg.github.io/vp-request-spec/). The Identity Authorization requires signing into a [Magic link](https://magic.link/docs/home/welcome).
 - [Onyx SDK API](med_app/packages/onyx-ssi-sdk) executes [`create-and-sign-vp.ts`](med_app/packages/onyx-ssi-sdk/src/holder/create-and-sign-vp.ts) to produce the verifiable presentation (VP) issued by the patient.
  - Signed VP is written to file, [`medicationRequest_vp.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json), simply simulating DB store at the issuer. 
-- [SoulBound NFT Receipt token](https://testnets.opensea.io/collection/soulboundrecord-1) is minted and sent to the Patient's Smart Account address: `0xae2Dd7f355bE651A71E72B780cdEf3D38a7EDAf6` on [Polygon's Mumbai Testnet](TODO). In detail, the following occurs:
+- [SoulBound NFT Receipt token](https://testnets.opensea.io/collection/healthrecordnftreceipt) is minted and sent to the Patient's Smart Account address: `0xae2Dd7f355bE651A71E72B780cdEf3D38a7EDAf6` on [Polygon's Mumbai Testnet](https://mumbai.polygonscan.com/address/0xae2dd7f355be651a71e72b780cdef3d38a7edaf6#tokentxnsErc721). In detail, the following occurs:
     - The `DID:Key` representing the Issuers signed VC is added to a metadata object and uploaded to [IPFS](https://docs.ipfs.tech/) via [Pinata](https://docs.pinata.cloud/docs) to obtain a [CID](https://docs.pinata.cloud/docs/cids) for use during the minting of the NFT Receipt token.
     - [Biconomy's Sponsored Paymaster Service](https://docs.biconomy.io/docs/Biconomy%20AA%20Stack/Paymaster/description) creates a gasless experience for the patient. Signing onto [Magic link](https://magic.link/docs/home/welcome) is a requirement in order for the process to run.
     - The [VC SoulBound Receipt Contract](registry/src/VCSoulBoundReceipt.sol) address: `0x50F49A3B09BD7597ff588686843d9b03070EdCbe` was previously setup and deployed on the [testnet](https://mumbai.polygonscan.com/address/0x50F49A3B09BD7597ff588686843d9b03070EdCbe). The patient's smart account address was also granted a MINTER_ROLE for the project demo. [Remix](https://remix.ethereum.org/) was utilized to setup the NFT contract for the project's demo. No UI has been created for granting/revoking of roles or NFT token burn at the completion of this hackathon project.
@@ -68,7 +68,8 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 
 ### [SoulBound NFT Contract](registry)
 - Created smart contract code using [Foundry](https://book.getfoundry.sh/)
-    - [`SoulBoundRecord.sol`](registry/src/SoulBoundRecord.sol)
+    - [`VCSoulBoundReceipt.sol`](registry/src/VCSoulBoundReceipt.sol)
+    - [`VCSoulBoundReceipt_flatten.sol`](registry/src/flatten/VCSoulBoundReceipt_flatten.sol) - For verifying contract on testnet
 
 ### [zkVM API](zk_app)
 - Created with [Rust](https://www.rust-lang.org/)
@@ -128,24 +129,48 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - [Node](https://nodejs.org/en) v18.17.1
 - [Cargo](https://doc.rust-lang.org/cargo/getting-started/index.html) 1.72.1
 
-### Instructions
+### Instructions:
+
+#### The NFT Receipt portion of the app can be ignored if you don't want to setup the Web3 related items in the env file. Otherwise the following will be needed:
+- Deploy [SoulBound NFT contract](registry/src/VCSoulBoundReceipt.sol), grant MINTER_ROLES to Biconomy Smart Account address, and Verify contract on [Polygon Mumbai Testnet](https://mumbai.polygonscan.com/)
+- Setup [Biconomy Paymaster](https://docs.biconomy.io/docs/dashboard/paymaster), Deposit Mumbai testnet [Matic tokens](https://faucet.polygon.technology/) in Gas-Tank, add NFT contract to the policy allowing the `safeMint` method.
+- Setup a [Magic](https://magic.link/) account
+
+#### Setup env files, remove `.example` from filename:
+- For Frontend: [env](med_app/.env.example)
+- For Onyx SDK: [env](med_app/packages/onyx-ssi-sdk/.env.example)
+    - Run script to create keys for env file:
+        - `cd ./med_app/packages/onyx-ssi-sdk`
+        - `npm run create:keypair`
+
+#### Install Dependencies for Node packages and Rust crates
+
+- Frontend - runs on port:3000
+- Onyx API - runs on port:3001
+- zkVM API - runs on port:8080
 
 ```
-# Frontend - runs on port:3000
 cd med-app
 npm install
 npm run dev
 
-# Onyx API - runs on port:3001
 cd packages/onyx-ssi-sdk
 npm run dev
 
-# zkVM API - runs on port:8080
-# Return to project root directory
+
+// Return to project root directory
 cd zk_app
 cargo run --release
 ```
 
+Open in browser, [localhost:3000](http://localhost:3000), enjoy!
 
-### About the Dev
+---
+### MISC: From Design Thinking Onyx Hackathon Workshop
 
+![Opportunity Canvas](media/opp_canvas.png)
+![Story Map](media/story.png)
+
+---
+### [About the Dev](https://linktr.ee/chrissalvador)
+---
