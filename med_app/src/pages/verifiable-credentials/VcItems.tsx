@@ -7,6 +7,7 @@ import verifiableCredentials from './vc_store/medicationRequest_vc.json';
 import verifiablePresentations from './vc_store/medicationRequest_vp.json';
 import { StatusBadge } from '@medplum/react';
 import { IIssuedVerifiableCredential } from './types/verifiableCredential';
+import { IVerifiablePresentation } from './types/verifiablePresentation';
 
 export function VcItems(): JSX.Element {
   const theme = useMantineTheme();
@@ -27,7 +28,7 @@ export function VcItems(): JSX.Element {
                   VC#: {record.id}
                 </Text>
               </div>
-              <StatusBadge status={verifiablePresentations.some((vp) => vp.id === record.id) ? "Signed" : "Not Signed"} />
+              <StatusBadge status={(verifiablePresentations as IVerifiablePresentation[]).some((vp) => vp.id === record.id) ? "Signed" : "Not Signed"} />
               <IconChevronRight color={theme.colors.gray[5]} />
             </InfoButton>
           ))}

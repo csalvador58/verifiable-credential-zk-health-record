@@ -30,10 +30,10 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - Fulfils Identity Authorization to request for a [verifiable presentation (VP)](https://w3c-ccg.github.io/vp-request-spec/). The Identity Authorization requires signing into a [Magic link](https://magic.link/docs/home/welcome).
 - [Onyx SDK API](med_app/packages/onyx-ssi-sdk) executes [`create-and-sign-vp.ts`](med_app/packages/onyx-ssi-sdk/src/holder/create-and-sign-vp.ts) to produce the verifiable presentation (VP) issued by the patient.
  - Signed VP is written to file, [`medicationRequest_vp.json`](med_app/src/pages/verifiable-credentials/vc_store/medicationRequest_vp.json), simply simulating DB store at the issuer. 
-- [SoulBound NFT Receipt token](https://testnets.opensea.io/collection/soulboundrecord-1) is minted and sent to the Patient's Smart Account address: `0x59813E0B81C13d262054FD17c83460A7CE94Bbfc` on [Polygon's Mumbai Testnet](https://mumbai.polygonscan.com/address/0x59813e0b81c13d262054fd17c83460a7ce94bbfc#tokentxnsErc721). In detail, the following occurs:
+- [SoulBound NFT Receipt token](https://testnets.opensea.io/collection/soulboundrecord-1) is minted and sent to the Patient's Smart Account address: `0xae2Dd7f355bE651A71E72B780cdEf3D38a7EDAf6` on [Polygon's Mumbai Testnet](TODO). In detail, the following occurs:
     - The `DID:Key` representing the Issuers signed VC is added to a metadata object and uploaded to [IPFS](https://docs.ipfs.tech/) via [Pinata](https://docs.pinata.cloud/docs) to obtain a [CID](https://docs.pinata.cloud/docs/cids) for use during the minting of the NFT Receipt token.
     - [Biconomy's Sponsored Paymaster Service](https://docs.biconomy.io/docs/Biconomy%20AA%20Stack/Paymaster/description) creates a gasless experience for the patient. Signing onto [Magic link](https://magic.link/docs/home/welcome) is a requirement in order for the process to run.
-    - The [SoulBound NFT Contract](registry/src/SoulBoundRecord.sol) address: `0xa543cf2937b0b00b62f325b3b778517be3d7cebc` was previously setup and deployed on the [testnet](https://mumbai.polygonscan.com/address/0xa543cf2937b0b00b62f325b3b778517be3d7cebc). The patient's smart account address was also granted a MINTER_ROLE for the project demo. [Remix](https://remix.ethereum.org/) was utilized to setup the NFT contract for the project's demo. No UI has been created for granting/revoking of roles or NFT token burn at the completion of this hackathon project.
+    - The [VC SoulBound Receipt Contract](registry/src/VCSoulBoundReceipt.sol) address: `0x50F49A3B09BD7597ff588686843d9b03070EdCbe` was previously setup and deployed on the [testnet](https://mumbai.polygonscan.com/address/0x50F49A3B09BD7597ff588686843d9b03070EdCbe). The patient's smart account address was also granted a MINTER_ROLE for the project demo. [Remix](https://remix.ethereum.org/) was utilized to setup the NFT contract for the project's demo. No UI has been created for granting/revoking of roles or NFT token burn at the completion of this hackathon project.
 - Sequence Ends, Patient has access to the signed VP and able to share with a verifier.
 
 
@@ -47,6 +47,7 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 - Additionally, a verifier can manually verify the patient's smart account for the NFT Receipt to match the `DID:Key` related to a verifiable credential. 
 - Sequence Ends, zk proof verified.
 
+---
 ## Components
 
 ### [Frontend](med_app/src)
@@ -75,8 +76,8 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
     - [`lib.rs`](zk_app/host/src/lib.rs) - Host code using [RISC zero zkVM](https://dev.risczero.com/zkvm/developer-guide/host-code-101)
     - [`main.rs`](zk_app/methods/guest/src/main.rs) - Guest code using [RISC zero zkVM](https://dev.risczero.com/zkvm/developer-guide/guest-code-101)
 
-
-### Demo Walkthrough
+---
+## Demo Walkthrough
 
 [Patient] </br>
 1. Click `Log in` button on the top-right of screen: 
@@ -121,21 +122,30 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 2. Click on each `Verify` button to perform describe verification. Chevron icons are available to view the JWT strings
 </br>![zk verification](media/zk_verify.png)
 
+---
+## Setting up project
+### Required package mangers and version used in this project:
+- [Node](https://nodejs.org/en) v18.17.1
+- [Cargo](https://doc.rust-lang.org/cargo/getting-started/index.html) 1.72.1
 
-### About the Dev
+### Instructions
 
 ```
-# Frontend Port:3000
+# Frontend - runs on port:3000
 cd med-app
 npm install
 npm run dev
 
-# Onyx with API Port:3001
+# Onyx API - runs on port:3001
 cd packages/onyx-ssi-sdk
 npm run dev
 
-# zkVM Port:8080
+# zkVM API - runs on port:8080
 # Return to project root directory
 cd zk_app
 cargo run --release
 ```
+
+
+### About the Dev
+

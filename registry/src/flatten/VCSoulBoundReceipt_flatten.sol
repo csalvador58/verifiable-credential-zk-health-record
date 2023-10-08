@@ -1918,7 +1918,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
     }
 }
 
-contract SoulboundRecord is
+contract HealthRecordNFTReceipt is
     ERC721,
     ERC721URIStorage,
     ERC721Burnable,
@@ -1930,7 +1930,7 @@ contract SoulboundRecord is
     event NewRecord(address indexed owner, uint256 indexed tokenId);
     event RecordDeleted(address indexed owner, uint256 indexed tokenId);
 
-    constructor() ERC721("SoulboundRecord", "HMS") {
+    constructor() ERC721("HealthRecordNFTReceipt", "EHR") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }
@@ -1977,7 +1977,7 @@ contract SoulboundRecord is
     {
         require(
             from == address(0) || to == address(0),
-            "SoulboundRecord: token is non-transferrable"
+            "HealthRecordNFTReceipt: token is non-transferrable"
         );
     }
 
@@ -1998,7 +1998,7 @@ contract SoulboundRecord is
         require(
             ownerOf(tokenId) == msg.sender ||
                 hasRole(DEFAULT_ADMIN_ROLE, msg.sender),
-            "SoulboundRecord: caller is not the owner of token or has an admin role"
+            "HealthRecordNFTReceipt: caller is not the owner of token or has an admin role"
         );
         _burn(tokenId);
     }

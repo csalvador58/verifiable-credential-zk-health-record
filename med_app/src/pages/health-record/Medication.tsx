@@ -34,7 +34,7 @@ export function Medication(): JSX.Element {
           <Link to="/vc-main" style={{ textDecoration: 'none' }}>
             <span style={{ fontWeight: 'bold', color: 'blue', marginLeft: '1rem' }}>
               {' '}
-              Click here to go the Verifiable Credentials section to view your issued credentials
+              Click here to view your issued credentials or go to the Verifiable Credentials section of this site.
             </span>
           </Link>{' '}
         </>
@@ -153,13 +153,12 @@ function Instructions({ name, value }: { name: string; value: string | undefined
       </Text>
       <div>
         Click the submit button to request a Verifiable Credential for this medical record. Your Healthcare Provider
-        will issue a signed credential containing a digital proof version of this record. After a few moments, visit the{' '}
+        will issue a signed credential containing a digital proof version of this record. After a few minutes, visit the{' '}
         <Link to="/vc-main" style={{ textDecoration: 'none' }}>
           <span style={{ fontWeight: 'bold', color: 'blue' }}> Verifiable Credential</span>
         </Link>{' '}
-        section of this site to view the proof of your credential. At any time, you can claim an NFT receipt containing
-        the DID:key associated with this verifiable credential and is non-transferable. Your Smart Account will be linked to the login email used during the Authorization process. The email you logged in with is <span style={{ fontWeight: 'bold', color: 'blue' }}>{value}</span>. Present the DID:key
-        to a verifier who will perform a verification via a DID Registry.
+        section of this site to view the proof of your credential. At any time, you can claim a non-transferable NFT receipt for
+        the DID:key associated with this VC. Your Smart Account will be linked to the login email used during the initial Authorization process. Your email for this account is <span style={{ fontWeight: 'bold', color: 'blue' }}>{value}</span>.
       </div>
     </div>
   );

@@ -2,7 +2,6 @@
 **/node_modules/
 **/.env
 **/archive
-**/vc_store
 
 # testing
 **/coverage*/
