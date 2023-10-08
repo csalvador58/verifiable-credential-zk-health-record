@@ -164,7 +164,7 @@ export function VpItem(): JSX.Element {
         {
           pending: 'NFT creation in progress',
           success: 'Successfully minted NFT!',
-          error: 'Error occurred during transaction. Please try again.',
+          error: 'Error occurred during transaction. Please try again after 5-10 minutes.',
         },
         {
           position: 'top-right',
@@ -181,10 +181,6 @@ export function VpItem(): JSX.Element {
       setIsMinted(true); // Display link to Verifiable Credentials section
     } catch (error) {
       console.error(error);
-      displayToast({
-        message: 'Error with transactions. Please try again after 10 minutes.',
-        type: 'error',
-      });
     }
   };
 
@@ -324,17 +320,23 @@ const handleMintRequest = async ({ cid }: MintRequest): Promise<number> => {
       message: 'Submitting transaction to Paymaster',
       type: 'info',
     });
-    const userOpResponse = await processPaymaster({
+    const transactionDetails = await processPaymaster({
       partialUserOp,
       biconomySmartAccount,
       BiconomyPaymaster,
       paymasterServiceData,
     });
-    console.log('userOpResponse: ', userOpResponse);
-    return tokenId;
-  } catch (error) {
-    console.error('Error executing transaction:', error);
-    return 0;
+    console.log('transactionDetails: ', transactionDetails);
+
+    // Return tokenId if transaction was successful
+    if(transactionDetails.success === 'true') {
+      return tokenId;
+    } else {
+      throw new Error('Error minting NFT');
+    }
+
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 };
 
@@ -376,13 +378,14 @@ const setupMintUserOp = async ({ to, tokenId, uri, biconomySmartAccount, web3Pro
       // optional params...
     };
 
-    return { partialUserOp, BiconomyPaymaster, paymasterServiceData } as MintUserOpResponse;
+    if(!!partialUserOp && !!BiconomyPaymaster && !!paymasterServiceData) {
+      return { partialUserOp, BiconomyPaymaster, paymasterServiceData } as MintUserOpResponse;
+    } else {
+      throw new Error('Error setting up MintUserOp');
+    }
+
   } catch (error) {
-    console.error('Error executing transaction:', error);
-    displayToast({
-      message: 'Error executing transaction. Please try again.',
-      type: 'error',
-    });
+    throw new Error('Error setting up MintUserOp');
   }
 };
 
@@ -402,15 +405,9 @@ const processPaymaster = async ({
     const userOpResponse = await biconomySmartAccount.sendUserOp(partialUserOp);
     const transactionDetails = await userOpResponse.wait();
 
-    console.log('Transaction Details:', transactionDetails);
-    // console.log('Transaction Hash:', userOpResponse.userOpHash);
-
-    return userOpResponse;
+   return transactionDetails
+    
   } catch (error) {
-    console.error('Error executing transaction:', error);
-    displayToast({
-      message: 'Error executing transaction. Please try again.',
-      type: 'error',
-    });
+    throw new Error('Error processing Paymaster');
   }
 };
