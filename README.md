@@ -10,7 +10,8 @@ VC ZK Health Records (VC-ZK HR) project was built during a [Digital Identity Hac
 
 
 ## Project Demo
-![Project Demo](media/Encode_Onyx_VC-ZK-HR.mp4)
+https://github.com/csalvador58/verifiable-credential-zk-health-record/blob/main/media/Encode_Onyx_VC-ZK-HR.mp4
+
 
 ## Trust Triangle and Flow Diagram
 
